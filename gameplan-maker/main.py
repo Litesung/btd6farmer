@@ -11,25 +11,30 @@ import hashlib
 import time
 class GamePlanMaker():
     def __init__(self):
+        def test():
+            print("hello world")
+
         self.keybinds = {
-            "next_round": "ctrl+n",
-            "save_instruction": "ctrl+s",
-            "Undo": "ctrl+z",
-            "redo": "ctrl+r",
-            "save": "ctrl+S",
-            "exit": "ctrl+Q",
+            "next_round": ("ctrl+n+r", test),
+            "save_instruction": ("ctrl+s", test),
+            "Undo": ("ctrl+z", test),
+            "redo": ("ctrl+r", test),
+            "save": ("ctrl+S", test),
+            "exit": ("ctrl+Q", self.exit),
         }
 
         self.gameplan = {}
         self.threads = []
         
-        self.last_action = None
+        self._last_action = None
 
-        def test():
-            print("hello world")
 
+
+        # Sets up keybind listner
         for keybind_key, keybind_value in self.keybinds.items():
-            self.add_key_listner(keybind_value, test)
+            print(keybind_value)
+            keybind, callback_function = keybind_value
+            self.add_key_listner(keybind, callback_function)
 
 
         try:
@@ -77,7 +82,8 @@ class GamePlanMaker():
 
         """
     
-    def get_kebind(self) -> str:
+    @property
+    def last_action(self) -> str:
         """
             Returns the keybind for the last action
         """
