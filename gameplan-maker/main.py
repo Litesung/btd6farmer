@@ -9,33 +9,52 @@ import json
 import base64
 import hashlib
 import time
+import os 
+import sys
 class GamePlanMaker():
     def __init__(self):
         def test():
             print("hello world")
 
+
         self.keybinds = {
-            "next_round": ("ctrl+n+r", test),
-            "save_instruction": ("ctrl+s", test),
-            "Undo": ("ctrl+z", test),
-            "redo": ("ctrl+r", test),
-            "save": ("ctrl+S", test),
-            "exit": ("ctrl+Q", self.exit),
+            "next_round": {
+                "keybind": "ctrl+n+r",
+                "callback": test
+            },
+            "save_instruction": {
+                "keybind": "ctrl+s",
+                "callback": test
+            },
+            "Undo": {
+                "keybind": "ctrl+z",
+                "callback": test
+            },
+            "redo": {
+                "keybind": "ctrl+r",
+                "callback": test
+            },
+            "save": {
+                "keybind": "ctrl+S",
+                "callback": test
+            },
+            "exit": {
+                "keybind": "ctrl+Q",
+                "callback": self.exit
+            },
         }
 
         self.gameplan = {}
         self.threads = []
         
-        self._last_action = None
-
-
-
         # Sets up keybind listner
-        for keybind_key, keybind_value in self.keybinds.items():
-            print(keybind_value)
-            keybind, callback_function = keybind_value
-            self.add_key_listner(keybind, callback_function)
+        for keybind_descriptor, keybind_dict in self.keybinds.items():
+            key, callback_function = keybind_dict.values()
+            print(keybind_dict)
+            print(key)
+            self.add_key_listner(key, callback_function)
 
+        self.running = True
 
         try:
             if sys.platform == "win32":
@@ -47,23 +66,27 @@ class GamePlanMaker():
 
     def exit(self, save_temp=True):
         """
-            Exits the program
+            Exits the gameplan maker
         """
         if save_temp:
-            self.save_temp()
+            tempfile_path = self.save_temp()
+            print("Saved temp gameplan in {}".format(tempfile_path))
 
         print("Exiting..")
-        sys.exit(0)
+
+        self.running = False ## Stops the main while loop
+        sys.exit(0) # Exit the thread
 
     def add_key_listner(self, key, callback_function):
         """
             Creates a thread for a keybind 
         """
         def key_function(key, callback_function):
+            print("key_function {}".format(key))
             while True:
                 if keyboard.is_pressed(key):
                     print("DEBUG: Key pressed: " + key)
-                    callback_function()
+                    callback_function() # calls the function provided
                     time.sleep(0.25)
 
         self.threads.append(Thread(target=key_function, args=(key, callback_function,), daemon=True).start())
@@ -77,16 +100,17 @@ class GamePlanMaker():
             for line in f:
                 self.gameplan.append(line)
 
-    def save_temp(self) -> None:
+    def save_temp(self) -> str:
         """
-
+            returns the filepath to the saved temp file
         """
     
     @property
-    def last_action(self) -> str:
+    def last_action(self) -> str | None:
         """
             Returns the keybind for the last action
         """
+        return None
         
     @property
     def current_position(self) -> tuple:
@@ -128,16 +152,11 @@ class GamePlanMaker():
 
 def main():
     gamplanmaker_instance = GamePlanMaker()
-    import os, sys
-    # Loop 
-    os.system("cls")
+    # os.system("cls||clear")
 
     ## TODO: set up event listner for keybinds when ingame
-    for gameplan_key, gameplan_value in gamplanmaker_instance.keybinds.items():
-        keyboard.add_hotkey(gameplan_value, gamplanmaker_instance.log)
-        print(f"{gameplan_key}: {gameplan_value}")
 
-    while True:
+    while gamplanmaker_instance.running:
         # https://stackoverflow.com/questions/2084508/clear-terminal-in-python
         # print(chr(27) + "[2J")
         sys.stdout.write("\r")
