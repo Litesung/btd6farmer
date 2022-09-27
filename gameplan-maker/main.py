@@ -65,6 +65,12 @@ class MyEncoder(json.JSONEncoder):
         return json_repr
 
 
+"""
+TODO plans: 
+    - if prompt user for inputs, wait for user to be done...
+    - the user can specify the path to the instructions if they want to edit it ( replaces the need for a temp file), just save to the main instructions file
+"""
+
 class GamePlanMaker():
     def __init__(self):
         def test():
@@ -206,6 +212,8 @@ class GamePlanMaker():
     def init_setupfile(self):
         """
             Creates a setup file for the gameplan by asking user questions
+
+            TODO: Print instructions to the user (how to use) then propmt with questions
         """
         self.difficulty = input("Difficulty: ")
         self.map = input("Map: ")
