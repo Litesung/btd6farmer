@@ -19,7 +19,7 @@ class GamePlanMaker():
             "save": "ctrl+S",
             "exit": "ctrl+Q",
         }
-        
+
         self.gameplan = {}
         self.threads = []
         
@@ -59,6 +59,7 @@ class GamePlanMaker():
                 if keyboard.is_pressed(key):
                     print("DEBUG: Key pressed: " + key)
                     callback_function()
+                    time.sleep(0.25)
 
         self.threads.append(Thread(target=key_function, args=(key, callback_function,), daemon=True).start())
         
