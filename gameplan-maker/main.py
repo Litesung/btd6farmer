@@ -79,17 +79,22 @@ class GamePlanMaker():
 
     def add_key_listner(self, key, callback_function):
         """
-            Creates a thread for a keybind 
+            Creates a thread for a keybind with a callback function to be called when the keybind is pressed
         """
-        def key_function(key, callback_function):
-            print("key_function {}".format(key))
+        def listen_for_key(key, callback_function):
+            is_pressed = False
             while True:
-                if keyboard.is_pressed(key):
+                if keyboard.is_pressed(key) and not is_pressed:
                     print("DEBUG: Key pressed: " + key)
                     callback_function() # calls the function provided
-                    time.sleep(0.25)
+                    is_pressed = True
+                    print(is_pressed)
+                elif not keyboard.is_pressed(key):
+                    is_pressed = False
+                
+                # time.sleep(0.25)
 
-        self.threads.append(Thread(target=key_function, args=(key, callback_function,), daemon=True).start())
+        self.threads.append(Thread(target=listen_for_key, args=(key, callback_function,), daemon=True).start())
         
 
     def add_item(self, item):
