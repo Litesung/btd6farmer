@@ -1,11 +1,13 @@
 from pathlib import Path
 import mouse
+import keyboard
 import tkinter
 import sys
 import ctypes
 import json
 import base64
 import hashlib
+import time
 
 class GamePlanMaker():
     def __init__(self):
@@ -21,6 +23,9 @@ class GamePlanMaker():
         
         
         self.last_action = None
+
+        ## TODO:  Set up event listner for keybinds when ingame
+
 
         try:
             if sys.platform == "win32":
@@ -48,8 +53,8 @@ class GamePlanMaker():
             Returns the keybind for the last action
         """
         
-
-    def get_position(self) -> tuple:
+    @property
+    def current_position(self) -> tuple:
         """
             Returns the current position of the mouse with normalized cordinates
         """
@@ -61,6 +66,11 @@ class GamePlanMaker():
         """
             Creates a setup file for the gameplan by asking user questions
         """
+        self.difficulty = input("Difficulty: ")
+        self.map = input("Map: ")
+        self.hero = input("Hero: ")
+        self.rounds = input("Rounds: ")
+        
 
     def hard_save(self, filename):
         """
@@ -70,7 +80,7 @@ class GamePlanMaker():
             for item in self.gameplan:
                 f.write(item + "")
 
-    def Log(self,) -> None:
+    def log(self,) -> None:
         """
             loop log which prints keybinds and last action
         """
@@ -81,7 +91,25 @@ class GamePlanMaker():
         print('='*10)
 
 
+def main():
+    gamplanmaker_instance = GamePlanMaker()
+    import os, sys
+    # Loop 
+    os.system("cls")
+
+    while True:
+        # https://stackoverflow.com/questions/2084508/clear-terminal-in-python
+        # print(chr(27) + "[2J")
+        sys.stdout.write("\r")
+        sys.stdout.flush()
+        # gamplanmaker_instance.log()
+        sys.stdout.write(str(gamplanmaker_instance.current_position))
+        # gamplanmaker_instance.log()
+        # print(gamplanmaker_instance.current_position)
+        # time.sleep(0.2)
+
 if __name__ == "__main__":
+    main()
     with open(Path(__file__).parents[1] / Path("Instructions/Dark_Castle_Hard_Standard/instructions.json"), "r") as f:
         data = str(f.readlines())
         encoded_md5 = hashlib.md5(data.encode()).hexdigest()
