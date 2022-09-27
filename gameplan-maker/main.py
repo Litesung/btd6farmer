@@ -1,4 +1,5 @@
 from pathlib import Path
+from threading import Thread
 import mouse
 import keyboard
 import tkinter
@@ -8,23 +9,27 @@ import json
 import base64
 import hashlib
 import time
-
 class GamePlanMaker():
     def __init__(self):
         self.keybinds = {
-            "next": "l",
-            "Click": "c",
-            "Move": "m",
-            "Wait": "w",
-            "save": "ctrl+s",
-            "exit": "ctrl+q",
+            "next_round": "ctrl+n",
+            "save_instruction": "ctrl+s",
+            "Undo": "ctrl+z",
+            "redo": "ctrl+r",
+            "save": "ctrl+S",
+            "exit": "ctrl+Q",
         }
-        self.gameplan = {}
         
+        self.gameplan = {}
+        self.threads = []
         
         self.last_action = None
 
-        ## TODO:  Set up event listner for keybinds when ingame
+        def test():
+            print("hello world")
+
+        for keybind_key, keybind_value in self.keybinds.items():
+            self.add_key_listner(keybind_value, test)
 
 
         try:
@@ -34,6 +39,29 @@ class GamePlanMaker():
             self.width, self.height = tk.winfo_screenwidth(), tk.winfo_screenheight()
         except Exception as e:
             raise Exception("Could not retrieve monitor resolution")
+
+    def exit(self, save_temp=True):
+        """
+            Exits the program
+        """
+        if save_temp:
+            self.save_temp()
+
+        print("Exiting..")
+        sys.exit(0)
+
+    def add_key_listner(self, key, callback_function):
+        """
+            Creates a thread for a keybind 
+        """
+        def key_function(key, callback_function):
+            while True:
+                if keyboard.is_pressed(key):
+                    print("DEBUG: Key pressed: " + key)
+                    callback_function()
+
+        self.threads.append(Thread(target=key_function, args=(key, callback_function,), daemon=True).start())
+        
 
     def add_item(self, item):
         self.gameplan.append(item)
@@ -96,6 +124,11 @@ def main():
     import os, sys
     # Loop 
     os.system("cls")
+
+    ## TODO: set up event listner for keybinds when ingame
+    for gameplan_key, gameplan_value in gamplanmaker_instance.keybinds.items():
+        keyboard.add_hotkey(gameplan_value, gamplanmaker_instance.log)
+        print(f"{gameplan_key}: {gameplan_value}")
 
     while True:
         # https://stackoverflow.com/questions/2084508/clear-terminal-in-python
