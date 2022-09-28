@@ -31,22 +31,22 @@ class NoIndent(object):
         self.value = value
 
 
-class MyEncoder(json.JSONEncoder):
+class JsonObjEncoder(json.JSONEncoder):
     FORMAT_SPEC = '@@{}@@'
     regex = re.compile(FORMAT_SPEC.format(r'(\d+)'))
 
     def __init__(self, **kwargs):
         # Save copy of any keyword argument values needed for use here.
         self.__sort_keys = kwargs.get('sort_keys', None)
-        super(MyEncoder, self).__init__(**kwargs)
+        super(JsonObjEncoder, self).__init__(**kwargs)
 
     def default(self, obj):
         return (self.FORMAT_SPEC.format(id(obj)) if isinstance(obj, NoIndent)
-                else super(MyEncoder, self).default(obj))
+                else super(JsonObjEncoder, self).default(obj))
 
     def encode(self, obj):
         format_spec = self.FORMAT_SPEC  # Local var to expedite access.
-        json_repr = super(MyEncoder, self).encode(obj)  # Default JSON.
+        json_repr = super(JsonObjEncoder, self).encode(obj)  # Default JSON.
 
         # Replace any marked-up object ids in the JSON repr with the
         # value returned from the json.dumps() of the corresponding
@@ -106,6 +106,10 @@ class GamePlanMaker():
             "change_target": {
                 "keybind": "ctrl+c+t",
                 "callback": self.CHANGE_TARGET
+            },
+            "debug_test": {
+                "keybind": "ctrl+shift+t",
+                "callback": self.INSERT_DEBUG_TEST
             },
             "Undo": {
                 "keybind": "ctrl+z",
@@ -187,6 +191,10 @@ class GamePlanMaker():
                         # append the instruction to the current round
                         self.gameplan[self.current_round].append(callback)
 
+                        d = self.save_file()
+                        if d:
+                            print("DEBUG: Saved gameplan in {}".format(d))
+
                     print(self.gameplan)
 
                 elif not keyboard.is_pressed(key): # reset is_pressed when key is released
@@ -204,6 +212,16 @@ class GamePlanMaker():
         with open(filename, "r") as f:
             self.gameplan = json.load(f)
 
+    def save_file(self) -> str | None:
+        """
+            Saves the gameplan to a file
+
+            returns the filepath to the saved temp file
+        """
+        filename = "gameplantest.json"
+        with open(filename, "w") as f:
+            json.dump(self.gameplan, f, indent=4, cls=JsonObjEncoder)
+            return filename
 
     def save_tempfile(self) -> str | None:
         """
@@ -286,6 +304,12 @@ class GamePlanMaker():
             for item in self.gameplan:
                 f.write(item + "")
 
+    def log_round_instructions(self) -> None:
+        """
+            Logs the instructions for the current round to output
+        """
+        pass
+
     def log(self,) -> None:
         """
             loop log which prints keybinds and last action
@@ -298,7 +322,20 @@ class GamePlanMaker():
         print(f"Last action: {self.last_action}")
         print('='*10)
 
-    
+    def INSERT_DEBUG_TEST(self) -> dict:
+        """
+            Debug function for testing
+        """
+        position = self.current_position
+
+        instruction = {}
+        instruction["INSTRUCTION_TYPE"] = "TEST_INSTRUCTION"
+        instruction["ARGUMENTS"] = {
+            "LOCATION": position,
+        }
+
+        return instruction
+
     def SET_STATIC_TARGET(self) -> dict:
         tower_position = self.current_position
         print("Waiting.. Move mouse to position of static target then press ctrl + enter")
