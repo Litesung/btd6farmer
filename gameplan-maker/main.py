@@ -1,7 +1,14 @@
+from fileinput import filename
 from pathlib import Path
 from threading import Thread
-import mouse
-import keyboard
+try:
+    import mouse
+    import keyboard
+except ImportError:
+    print("you need to run this script using sudo")
+    sys.exit(1)
+
+
 import tkinter
 import sys
 import ctypes
@@ -12,15 +19,12 @@ import time
 import os 
 import sys
 import argparse
-
-
+import zlib
 
 import json
 from _ctypes import PyObj_FromPtr
 import re
 # from pprint import pprint
-
-inputFile = r"C:\Users\limpan\Documents\GitHub\btd6farmer\Instructions\Dark_Castle_Hard_Standard\instructions.json"
 
 # https://stackoverflow.com/questions/13249415/how-to-implement-custom-indentation-when-pretty-printing-with-the-json-module
 
@@ -139,8 +143,7 @@ class GamePlanMaker():
         self.running = True
         self.should_compress = compress_save
 
-        if self.should_compress:
-            import zlib
+
 
         self.threads = []
         self.DEBUG_MODE = debug
@@ -164,8 +167,14 @@ class GamePlanMaker():
 
 
         # Loads temp file if it exists
+        if existing_gameplan:
+            self.existing_gameplan_path = Path(__file__).resolve().parents[1] / Path(existing_gameplan)
+            self.load_gameplan()
+        else:
+            # Prompting the user to a new setup
+            self.init_setupfile()
+                       
         # else creates a new gameplan instance with temp file
-        # Prompting the user to a new setup
 
     def exit(self, save_temp=True):
         """
@@ -207,7 +216,7 @@ class GamePlanMaker():
                         # append the instruction to the current round
                         self.gameplan[self.current_round].append(callback)
 
-                        d = self.save_file()
+                        d = self.save_gameplan()
                         if self.DEBUG_MODE and d:
                             print("DEBUG: Saved gameplan to {}".format(d))
 
@@ -221,27 +230,25 @@ class GamePlanMaker():
     def add_item(self, item):
         self.gameplan.append(item)
 
-    def load_tempfile(self):
-        filename = "tmp"
-        with open(filename, "r") as f:
-            self.gameplan = json.load(f)
-
-    def load_savefile(self):
+    def load_gameplan(self):
         """
             loads an already existing gameplan
         """
         try:
             # try to load the save file as a normal json
-            pass
+            # filename = self.existing_gameplan_path
+            with open(self.existing_gameplan_path, "r") as f:
+                self.gameplan = json.load(f)
         except:
             try:
                 # try to parse the file as compress by decompressing
-                pass
+                with open(self.existing_gameplan_path, "rb") as f:
+                    self.gameplan = json.loads(zlib.decompress(f.read()))
             except:
                 raise Exception("Could not load existing save file")
             
 
-    def save_file(self) -> str | None:
+    def save_gameplan(self) -> str | None:
         """
             Saves the gameplan to a file
 
@@ -319,11 +326,28 @@ class GamePlanMaker():
 
             TODO: Print instructions to the user (how to use) then propmt with questions
         """
-        self.gameplan_version = 1
-        self.difficulty = input("Difficulty: ")
-        self.map = input("Map: ")
-        self.hero = input("Hero: ")
-        self.rounds = input("Rounds: ")
+        print("Welcome to the gameplan maker")
+        input("Press enter to continue")
+
+
+        settings = {
+            "VERSION": 1,
+            "HERO": input("Hero: "),
+            "MAP": input("Map: "),
+            "DIFFICULTY": input("DIFFICULTY: "),
+            "GAMEMODE": input("Gamemode: ")
+        }
+
+        gameplan_path = Path(__file__).resolve().parents[1] / Path("{}_{}_{}".format(settings["MAP"], settings["DIFFICULTY"], settings["GAMEMODE"]))
+        
+        # create folder of not exist
+        if not gameplan_path.exists():
+            gameplan_path.mkdir()
+
+        # create setup file with settings data
+        with open(gameplan_path / Path("setup.json"), "w") as f:
+            json.dump(settings, f, indent=4)
+
         
 
     def final_save(self):
