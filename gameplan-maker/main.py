@@ -87,6 +87,26 @@ class GamePlanMaker():
                 "keybind": "ctrl+s",
                 "callback": test
             },
+            "place_tower": {
+                "keybind": "ctrl+p",
+                "callback": test
+            },
+            "upgrade_tower": {
+                "keybind": "ctrl+u",
+                "callback": test
+            },
+            "set_static_target": {
+                "keybind": "ctrl+s+t",
+                "callback": test
+            },
+            "set_round_start": {
+                "keybind": "ctrl+r+s",
+                "callback": test
+            },
+            "change_target": {
+                "keybind": "ctrl+c+t",
+                "callback": test
+            },
             "Undo": {
                 "keybind": "ctrl+z",
                 "callback": test
@@ -138,7 +158,6 @@ class GamePlanMaker():
             if save_temp:
                 tempfile_path = self.save_tempfile()
                 print("Saved temp gameplan in {}".format(tempfile_path))
-
             
         except Exception as e:
             print("Could not save temp file")
@@ -174,12 +193,13 @@ class GamePlanMaker():
             self.gameplan = json.load(f)
 
 
-    def save_tempfile(self) -> str:
+    def save_tempfile(self) -> str | None:
         """
             Everytime self.gameplan is changed save to tempfile
 
             returns the filepath to the saved temp file
         """
+        return None
     
     @property
     def last_action(self) -> str | None:
@@ -196,6 +216,7 @@ class GamePlanMaker():
         x, y = mouse.get_position()
         x_norm, y_norm = x / self.width, y / self.height
         return (x_norm, y_norm)
+
 
     def increment_round(self):
         """
@@ -227,7 +248,7 @@ class GamePlanMaker():
 
             TODO: get map, diff, gamemode from setup dict or file
         """
-        path = path(__file__).resolve().parents[1]/path("Instructions/{}_{}_{}".format(self.map, self.difficulty, self.gamemode))
+        path = Path(__file__).resolve().parents[1]/Path("Instructions/{}_{}_{}".format(self.map, self.difficulty, self.gamemode))
         
         if not path.is_dir():
             path.mkdir(parents=True)
@@ -249,7 +270,7 @@ class GamePlanMaker():
         print('='*10)
 
     
-    def SET_STATIC_TARGET(self):
+    def SET_STATIC_TARGET(self) -> dict:
         tower_position = self.current_position
         print("Waiting.. Move mouse to position of static target then press ctrl + enter")
         keyboard.wait("ctrl+enter")
@@ -264,14 +285,14 @@ class GamePlanMaker():
 
         return instruction
 
-    def UPGRADE_TOWER(self):
+    def UPGRADE_TOWER(self) -> dict | None:
         tower_position = self.current_position
         try:
-            upgrade_path = input("What tower are you placing? up, middle, bottom")
+            upgrade_path = input("What tower are you placing? up, middle, bottom (ex 1, 0, 2) > ")
             upgrade_path = list(map(int, upgrade_path.replace(" ", "").split(",")))
         except:
             print("Invalid input for upgrade path")
-
+            return None
 
         instruction = {}
 
@@ -283,7 +304,7 @@ class GamePlanMaker():
 
         return instruction
 
-    def PLACE_TOWER(self):
+    def PLACE_TOWER(self) -> dict | None:
         tower_position = self.current_position
         tower = input("What tower are you placing? ")
         instrucion = {}
@@ -297,7 +318,7 @@ class GamePlanMaker():
         return instrucion
 
 
-    def ROUND_START(self):
+    def ROUND_START(self) -> dict | None:
         """
             Inserts a round start instruction:
 
@@ -317,7 +338,7 @@ class GamePlanMaker():
 
         return instruction
 
-    def CHANGE_TARGET(self):
+    def CHANGE_TARGET(self) -> dict:
         tower_position = self.current_position
         target_type = input("What target type are you changing REGULAR or SPIKE? ")
         targets = input("What targets? ")
