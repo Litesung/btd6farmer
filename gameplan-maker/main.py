@@ -1,3 +1,4 @@
+from ast import Try
 from pathlib import Path
 from threading import Thread
 import mouse
@@ -11,6 +12,7 @@ import hashlib
 import time
 import os 
 import sys
+import argparse
 
 
 
@@ -32,6 +34,10 @@ class NoIndent(object):
 
 
 class JsonObjEncoder(json.JSONEncoder):
+    """
+        Sorts gameplan for easier navigation
+    """
+
     FORMAT_SPEC = '@@{}@@'
     regex = re.compile(FORMAT_SPEC.format(r'(\d+)'))
 
@@ -72,7 +78,7 @@ TODO plans:
 """
 
 class GamePlanMaker():
-    def __init__(self):
+    def __init__(self, compress_save=False, debug=False, existing_gameplan=None):
         def test():
             print("hello world")
 
@@ -132,12 +138,20 @@ class GamePlanMaker():
         self.gameplan = {}
         self.gameplan_before = {}
         self.running = True
+        self.should_compress = compress_save
+
+        if self.should_compress:
+            import zlib
+
         self.threads = []
+        self.DEBUG_MODE = debug
         
         # Sets up keybind listner
         for keybind_descriptor, keybind_dict in self.keybinds.items():
             key, callback_function = keybind_dict.values()
-            print("DEBUG: adding keybind: \n{}".format(keybind_dict))
+            if self.DEBUG_MODE:
+                print("DEBUG: adding keybind: \n{}".format(keybind_dict))
+            
             self.add_key_listner(key, callback_function)
         
 
@@ -178,11 +192,14 @@ class GamePlanMaker():
             is_pressed = False
             while True:
                 if keyboard.is_pressed(key) and not is_pressed:
-                    print("DEBUG: Key pressed: " + key)
+                    if self.DEBUG_MODE:
+                        print("DEBUG: Key pressed: " + key)
+
                     is_pressed = True
                     callback = callback_function() # calls the function provided
                     if isinstance(callback, dict):
-                        print("DEBUG: Added instruction to round {}".format(self.current_round))
+                        if self.DEBUG_MODE:
+                            print("DEBUG: Added instruction to round {}".format(self.current_round))
                         
                         # If the round is not yet in the gameplan, add it
                         if self.gameplan.get(self.current_round) is None:
@@ -192,10 +209,8 @@ class GamePlanMaker():
                         self.gameplan[self.current_round].append(callback)
 
                         d = self.save_file()
-                        if d:
-                            print("DEBUG: Saved gameplan in {}".format(d))
-
-                    print(self.gameplan)
+                        if self.DEBUG_MODE and d:
+                            print("DEBUG: Saved gameplan to {}".format(d))
 
                 elif not keyboard.is_pressed(key): # reset is_pressed when key is released
                     is_pressed = False
@@ -212,6 +227,21 @@ class GamePlanMaker():
         with open(filename, "r") as f:
             self.gameplan = json.load(f)
 
+    def load_savefile(self):
+        """
+            loads an already existing gameplan
+        """
+        try:
+            # try to load the save file as a normal json
+            pass
+        except:
+            try:
+                # try to parse the file as compress by decompressing
+                pass
+            except:
+                raise Exception("Could not load existing save file")
+            
+
     def save_file(self) -> str | None:
         """
             Saves the gameplan to a file
@@ -219,8 +249,16 @@ class GamePlanMaker():
             returns the filepath to the saved temp file
         """
         filename = "gameplantest.json"
-        with open(filename, "w") as f:
-            json.dump(self.gameplan, f, indent=4, cls=JsonObjEncoder)
+        if self.should_compress:
+            import zlib
+            with open(filename, "wb") as f:
+                compressed_data = zlib.compress(json.dumps(self.gameplan, cls=JsonObjEncoder, indent=None).encode("utf-8"))
+                f.write(compressed_data)
+                # json.dump(self.gameplan, f, indent=4, cls=JsonObjEncoder)
+        else:
+            with open(filename, "w") as f:
+                json.dump(self.gameplan, f, cls=JsonObjEncoder, indent=None)
+            
             return filename
 
     def save_tempfile(self) -> str | None:
@@ -424,10 +462,9 @@ class GamePlanMaker():
         return instruction
 
 
-def main():
-    gamplanmaker_instance = GamePlanMaker()
-    # os.system("cls||clear")
-
+def main(parser):
+    args = vars(parser.parse_args())
+    gamplanmaker_instance = GamePlanMaker(compress_save=args["compress"], debug=args["debug"], existing_gameplan=args["reuse"])
     ## TODO: set up event listner for keybinds when ingame
 
     while gamplanmaker_instance.running:
@@ -442,7 +479,12 @@ def main():
         # time.sleep(0.2)
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Gameplan maker")
+    parser.add_argument("-d", "--debug", action="store_true", help="Debug mode")
+    parser.add_argument("-r", "--reuse", type=str, help="Modify a already existing gameplan")
+    parser.add_argument("-c", "--compress", action="store_true", help="Compresses saved gameplan with zlib")
+    
+    main(parser)
     # import zlib
     # with open(Path(__file__).parents[1] / Path("Instructions/Dark_Castle_Hard_Standard/instructions.json"), "r") as f:
     #     data = str(f.readlines())
