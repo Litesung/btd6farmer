@@ -89,23 +89,23 @@ class GamePlanMaker():
             },
             "place_tower": {
                 "keybind": "ctrl+p",
-                "callback": test
+                "callback": self.PLACE_TOWER
             },
             "upgrade_tower": {
                 "keybind": "ctrl+u",
-                "callback": test
+                "callback": self.UPGRADE_TOWER
             },
             "set_static_target": {
                 "keybind": "ctrl+s+t",
-                "callback": test
+                "callback": self.SET_STATIC_TARGET
             },
             "set_round_start": {
                 "keybind": "ctrl+r+s",
-                "callback": test
+                "callback": self.ROUND_START
             },
             "change_target": {
                 "keybind": "ctrl+c+t",
-                "callback": test
+                "callback": self.CHANGE_TARGET
             },
             "Undo": {
                 "keybind": "ctrl+z",
@@ -176,7 +176,19 @@ class GamePlanMaker():
                 if keyboard.is_pressed(key) and not is_pressed:
                     print("DEBUG: Key pressed: " + key)
                     is_pressed = True
-                    callback_function() # calls the function provided
+                    callback = callback_function() # calls the function provided
+                    if isinstance(callback, dict):
+                        print("DEBUG: Added instruction to round {}".format(self.current_round))
+                        
+                        # If the round is not yet in the gameplan, add it
+                        if self.gameplan.get(self.current_round) is None:
+                            self.gameplan[self.current_round] = []
+
+                        # append the instruction to the current round
+                        self.gameplan[self.current_round].append(callback)
+
+                    print(self.gameplan)
+
                 elif not keyboard.is_pressed(key): # reset is_pressed when key is released
                     is_pressed = False
                 
@@ -217,12 +229,28 @@ class GamePlanMaker():
         x_norm, y_norm = x / self.width, y / self.height
         return (x_norm, y_norm)
 
+    @property
+    def current_round(self) -> str:
+        """
+            Returns the current selected round
+        """
+        self._current_round = 1
+        return str(self._current_round)
 
-    def increment_round(self):
+
+    def increment_round(self) -> None:
         """
             Increments the round
         """
-        pass
+        self._current_round += 1 
+
+    def decrease_round(self) -> None:
+        """
+            Increments the round
+        """
+        if self._current_round > 0:
+            self._current_round -= 1
+
 
     def insert_instruction(self, instruction):
         """
@@ -236,6 +264,7 @@ class GamePlanMaker():
 
             TODO: Print instructions to the user (how to use) then propmt with questions
         """
+        self.gameplan_version = 1
         self.difficulty = input("Difficulty: ")
         self.map = input("Map: ")
         self.hero = input("Hero: ")
