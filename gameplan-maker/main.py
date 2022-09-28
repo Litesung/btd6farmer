@@ -1,4 +1,3 @@
-from ast import Try
 from pathlib import Path
 from threading import Thread
 import mouse
