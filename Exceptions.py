@@ -4,3 +4,6 @@ class FailSafe(Exception):
         super().__init__(*args)
     def __str__(self):
         return 'Failsafe triggered. Exiting bot.'
+
+
+# add more exceptions for better debug purposes eg InvalidInstructionOption, InvalidGameplanPath
