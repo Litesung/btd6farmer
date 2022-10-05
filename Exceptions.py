@@ -6,4 +6,7 @@ class FailSafe(Exception):
         return 'Failsafe triggered. Exiting bot.'
 
 
+class InvalidGameplanPath(Exception):
+    """ Invalid / no gameplan path found """
+
 # add more exceptions for better debug purposes eg InvalidInstructionOption, InvalidGameplanPath

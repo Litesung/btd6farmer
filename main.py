@@ -4,7 +4,7 @@ import argparse
 from pathlib import Path
 from Bot import Bot
 from threading import Thread
-from Failsafe import FailSafe
+from Exceptions import FailSafe
 import mouse
 
 
