@@ -380,21 +380,6 @@ class BotUtils:
         result = self._locate_all(template_path, confidence)
         return result[0] if result is not None else None
 
-
-if __name__ == "__main__":
-    import time
-
-    inst = BotUtils()
-    inst.log = print
-    inst.DEBUG = True
-    time.sleep(2)
-
-
-    print(inst.getRound())
-
-    # res = inst._locate(inst._image_path("obyn"), confidence=0.9)
-    # print(res)
-
 class BotLog:
     def __init__(self):
         self.statDict = {
@@ -528,9 +513,8 @@ class Bot(BotCore):
         ability_three_timer = time.time()
         
         finished = False
-
-        middle_of_screen = ((self.width // 2) // self.width), ((self.height // 2) // self.height)
-
+        middle_of_screen = (0.5, 0.5)
+        
         # main ingame loop
         while not finished:
 
@@ -908,15 +892,6 @@ class Bot(BotCore):
             still_loading = self.loading_screen_check()
 
 if __name__ == "__main__":
-    # For testing purposes; open sandbox on dark castle and run Bot.py will place every tower
-    import time, sys
-    from pathlib import Path
-    time.sleep(2)
     gameplan_path = (Path(__file__).resolve().parent/sys.argv[sys.argv.index("--gameplan_path") + 1]) if "--gameplan_path" in sys.argv else exit(0)
     b = Bot(instruction_path=gameplan_path)
-    for round, instruction_list in b.game_plan.items():
-        print(round, instruction_list)
-        for instruction in instruction_list:
-            b.v1_handleInstruction(instruction)    
-            
-        
+    b.ingame_loop()
