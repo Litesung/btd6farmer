@@ -383,6 +383,20 @@ class GamePlanMaker():
         print(f"Last action: {self.last_action}")
         print('='*10)
 
+    def validate_user_input(self, dictionary, user_input):
+        """
+            Validates user input.
+
+            If the input (key) is valid return its dictionary value
+        """
+        keys = dictionary.keys()
+        
+        if user_input in keys:
+            return dictionary[user_input]
+        else:
+            return None
+
+
     def INSERT_DEBUG_TEST(self) -> dict:
         """
             Debug function for testing
