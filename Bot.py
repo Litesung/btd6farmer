@@ -529,7 +529,7 @@ class Bot(BotCore):
         
         finished = False
 
-        middle_of_screen = ((self.width // 2) // self.width), (( self.height // 2 ) // self.height)
+        middle_of_screen = ((self.width // 2) // self.width), ((self.height // 2) // self.height)
 
         # main ingame loop
         while not finished:
