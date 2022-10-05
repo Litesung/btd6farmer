@@ -150,7 +150,7 @@ The gameplan is a json file that contains the round as a key and the value as an
             "INSTRUCTION_TYPE": "PLACE_TOWER",
             "ARGUMENTS": {
                 "TOWER": "TOWER_TYPE",
-                "POSITION": [ x, y ]
+                "POSITION": [ 0.0000, 0.0000 ]
             }
         },
         {
