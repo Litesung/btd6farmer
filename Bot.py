@@ -457,8 +457,8 @@ class BotLog:
         
         return data
 
-    def log(self, *kargs):
-        print(*kargs)
+    def log(self, *args):
+        print(*args)
 
 class BotCore(BotLog, BotUtils):
     def __init__(self, instruction_path=Path.cwd()/"Instructions"/"Dark_Castle_Hard_Standard", game_plan_filename="instructions.json", game_settings_filename="setup.json"):
@@ -605,12 +605,45 @@ class Bot(BotCore):
                                 self.log("Current round", current_round) # Only print current round once
     
     @property
-    def baseXPGain(self):
+    def round_xp_gain(self):
         """
-            TODO: Calculate base xp gain
+            Round 1 starts off with 40 XP, and up until round 20 this amount increases by 20 each round (40 XP, 60 XP, 80 XP, and so on). Then on rounds 21-50 the amount experience gained each round increases by 40 each round (460 XP, 500 XP, and so on). And last, from round 51 and further, this amount increases by 90 each round (1710 XP, 1800 XP, and so on). Adding this up, you get a total of 231,150 XP in a game from round 6 to round 100 on Impoppable or C.H.I.M.P.S.. Each map difficulty above beginner gives a 10% xp bonus, e.g. playing on expert gives you a 30% XP boost. 
+
+            TODO: Calculate base xp gain per level
             https://github.com/hemisemidemipresent/cyberquincy/blob/dd41deb3fe44f0812331649c541344005b360a59/helpers/heroes.js#L54-L93
         """
-        return None
+
+        LEVELING_MAP_DIFFICULTY_MODIFIERS = {
+            "BEGINNER": 1,
+            "INTERMEDIATE": 1.1,
+            "ADVANCED": 1.2,
+            "EXPERT": 1.3,
+        }
+
+        acc_xp_gain = {
+
+        }
+        gain = 0
+        for r in range(1, 101):
+            if r == 0:
+                gain = 0
+            elif r == 1: # starts off with 40 XP
+                gain += 40
+            elif r < 21: # r2-r20
+                gain += 20
+            elif r < 51: # r21-r50
+                gain += 40
+            else:        # 90 gain
+                gain += 90
+
+            acc_xp_gain[r] = gain * LEVELING_MAP_DIFFICULTY_MODIFIERS[static.map_difficulties[self.settings["MAP"]]]
+
+        
+        print(sum([xp for xp in acc_xp_gain.values()]))
+        # from pprint import pprint
+        # pprint(acc_xp_gain)
+        # assert sum([xp for xp in acc_xp_gain.values()]) == 231150
+        return acc_xp_gain
             
 
     @property
@@ -646,44 +679,44 @@ class Bot(BotCore):
                 self.log("Ability aqquired at levels: {}, Hero placed round: {}".format(ability_levels_list, round_hero_placed))
 
             xp_ratio = static.hero_xp_ratio[self.settings["HERO"]]
-            bonus = 1.0
+            xp_map = self.round_xp_gain
             # for for every ability
             for level_ability_unlocked in ability_levels_list:
                 if self.DEBUG:
                     self.log("==Level that ability will be unlocked: {}".format(level_ability_unlocked))
 
                 # reset hero abillity counter to the round the hero was placed
-                hero_abillity_counter = round_hero_placed
+                round_since_hero_placed = round_hero_placed
 
                 # Defined xp_sum to the amount of xp earned at the end of the round
-                accumilated_xp_sum = static.hero_xp_per_level[hero_abillity_counter]
+                accumilated_xp_sum = xp_map[round_since_hero_placed]
 
                 # Calculate the total xp needed to reach ability level    
                 total_hero_xp_needed = 0
-                for hero_level, xp_gained_amount  in static.hero_xp.items():
-                    if hero_level <= level_ability_unlocked:
+                for hero_level, xp_gained_amount in static.hero_xp.items():
+                    if hero_level < level_ability_unlocked:
                         total_hero_xp_needed += xp_gained_amount 
+
                 total_hero_xp_needed *= xp_ratio
                         
                 print("total hero xp needed {} for ability gained from level {}".format(total_hero_xp_needed, level_ability_unlocked))
                 
-                while accumilated_xp_sum < total_hero_xp_needed:
-
-                    # XP gain undefined after round 100
-                    if hero_abillity_counter > 100:
-                        break
+                while accumilated_xp_sum < np.round(total_hero_xp_needed):
                     
-                    hero_abillity_counter += 1
-                    xp_gain = static.hero_xp_per_level[hero_abillity_counter] * bonus
+                    # XP gain undefined after round 100
+                    if round_since_hero_placed > 100:
+                        xp_gain += xp_map[100]
+                    
+                    round_since_hero_placed += 1
+                    xp_gain = np.round(xp_map[round_since_hero_placed])
                     accumilated_xp_sum += xp_gain
 
                     if self.DEBUG:
-                        self.log("added {} to xp_sum".format(static.hero_xp_per_level[hero_abillity_counter]))
-                        self.log("\tRound since hero placed: {};\n\txp_sum: {};\n\trequired xp {}".format(hero_abillity_counter, accumilated_xp_sum, total_hero_xp_needed))
-                    
+                        self.log("added {} to xp_sum".format(xp_map[round_since_hero_placed]))
+                        self.log("  Round since hero placed: {}; xp_sum: {}; required xp {}".format(round_since_hero_placed, accumilated_xp_sum, total_hero_xp_needed))
 
                 # When xp_sum is greater than to the xp needed for the next level, we have found the round
-                yield hero_abillity_counter
+                yield round_since_hero_placed + 1
 
         round_hero_placed = -1
         for round in self.game_plan.keys():
@@ -692,10 +725,19 @@ class Bot(BotCore):
                     if instruction["ARGUMENTS"]["MONKEY"] == "HERO":
                         round_hero_placed = int(round)
                         break
-        abilities_round = [ round for round in xp_forumla(static.hero_ability_unlock[self.settings["HERO"]], round_hero_placed) ]
+        abilities_round = [ r for r in xp_forumla(static.hero_ability_unlock[self.settings["HERO"]], round_hero_placed) ]
+        print(abilities_round)
         if self.DEBUG:
-            assert [14, 51] == xp_forumla([3, 10], 12), "Example rounds not correct with expected output"
+            print("Ability rounds set to: {}".format(abilities_round))
+            test1 = [r for r in xp_forumla([x for x in range(1, 20)], 12)]
+            test2 = [r for r in xp_forumla([x for x in range(1, 20)], 1 )]
+
+            print("Test1 levels 1-20 {}".format(test1))
+            print("Test2 levels 1-20 {}".format(test2))
+
+            assert [14, 51] == [r for r in xp_forumla([3, 10], 12)], "Example input not equal expected output"
             self.log("Hero abilities will be unlocked on rounds rounds: {}".format(abilities_round))
+            print("test")
 
         return abilities_round
 
