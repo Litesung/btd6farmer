@@ -92,6 +92,48 @@ hero_cooldowns = {
     "GERALDO"           : []                
 }
 
+# https://bloons.fandom.com/wiki/Experience_Points#BTD6_Heroes_XP
+# https://docs.google.com/spreadsheets/d/1s1xFOiWo_BgglLIftcqrfTD9Fnt4CUT1vOXYR1SwpFs/edit#gid=0
+hero_xp = {
+    "1": 180,
+    "2": 460,
+    "3": 1000,
+    "4": 1860,
+    "5": 3280,
+    "6": 5180,
+    "7": 8320,
+    "8": 9380,
+    "9": 13620,
+    "10": 16380,
+    "11": 14400,
+    "12": 16650,
+    "13": 14940,
+    "14": 16380,
+    "15": 17820,
+    "16": 19260,
+    "17": 20700,
+    "18": 16470,
+    "19": 17280,
+}
+
+hero_ability_unlock = {
+    "QUINCY"            : [3, 10],  
+    "GWENDOLIN"         : [3, 10],         
+    "STRIKER_JONES"     : [3, 10],  
+    "OBYN"              : [3, 10],         
+    "CAPTAIN_CHURCHILL" : [3, 10],  
+    "BENJAMIN"          : [3, 10],         
+    "EZILI"             : [3, 7, 10],     
+    "PAT_FUSTY"         : [3, 10],         
+    "ADORA"             : [3, 7, 10],     
+    "ADMIRAL_BRICKELL"  : [3, 7, 10],     
+    "ETIENNE"           : [3, 10],         
+    "SAUDA"             : [3, 10],         
+    "PSI"               : [3, 10],         
+    "GERALDO"           : []              
+}
+
+
 tower_keybinds = {
     "DART" : "q",
     "BOOMERANG" : "w",
