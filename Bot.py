@@ -674,11 +674,11 @@ class Bot(BotCore):
                         - Scholarships: -10% cost
                 - Each map difficulty above beginner gives a 10% xp bonus, e.g. playing on expert gives you a 30% XP boost. 
         """
-        def xp_forumla(ability_levels_list, round_hero_placed):
+        def xp_forumla(ability_levels_list, round_hero_placed, xp_ratio=static.hero_xp_ratio[self.settings["HERO"]], ):
             if self.DEBUG:
                 self.log("Ability aqquired at levels: {}, Hero placed round: {}".format(ability_levels_list, round_hero_placed))
 
-            xp_ratio = static.hero_xp_ratio[self.settings["HERO"]]
+            
             xp_map = self.round_xp_gain
             # for for every ability
             for level_ability_unlocked in ability_levels_list:
@@ -698,6 +698,7 @@ class Bot(BotCore):
                         total_hero_xp_needed += xp_gained_amount 
 
                 total_hero_xp_needed *= xp_ratio
+
                         
                 print("total hero xp needed {} for ability gained from level {}".format(total_hero_xp_needed, level_ability_unlocked))
                 
@@ -718,6 +719,8 @@ class Bot(BotCore):
                 # When xp_sum is greater than to the xp needed for the next level, we have found the round
                 yield round_since_hero_placed + 1
 
+
+        # Move this to somewhere else
         round_hero_placed = -1
         for round in self.game_plan.keys():
             for instruction in self.game_plan[round]:
@@ -725,19 +728,20 @@ class Bot(BotCore):
                     if instruction["ARGUMENTS"]["MONKEY"] == "HERO":
                         round_hero_placed = int(round)
                         break
+
         abilities_round = [ r for r in xp_forumla(static.hero_ability_unlock[self.settings["HERO"]], round_hero_placed) ]
         print(abilities_round)
+
         if self.DEBUG:
             print("Ability rounds set to: {}".format(abilities_round))
-            test1 = [r for r in xp_forumla([x for x in range(1, 20)], 12)]
-            test2 = [r for r in xp_forumla([x for x in range(1, 20)], 1 )]
+            test1 = [r for r in xp_forumla([x for x in range(1, 21)], 12)]
+            test2 = [r for r in xp_forumla([x for x in range(1, 21)], 1 )]
 
-            print("Test1 levels 1-20 {}".format(test1))
-            print("Test2 levels 1-20 {}".format(test2))
+            print("Test1 levels 1-20 placement on round 12 {}".format(test1))
+            print("Test2 levels 1-20 placement on round 6  {}".format(test2))
 
-            assert [14, 51] == [r for r in xp_forumla([3, 10], 12)], "Example input not equal expected output"
+            # assert [14, 51] == [r for r in xp_forumla([3, 10], 12)], "Example input not equal expected output"
             self.log("Hero abilities will be unlocked on rounds rounds: {}".format(abilities_round))
-            print("test")
 
         return abilities_round
 
