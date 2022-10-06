@@ -505,6 +505,8 @@ class Bot(BotCore):
         self.game_start_time = time.time()
         self.fast_forward = True
 
+        self.abilityRounds
+
     def initilize(self):
         if self.DEBUG:
             self.log("RUNNING IN DEBUG MODE, DEBUG FILES WILL BE GENERATED")
@@ -601,51 +603,100 @@ class Bot(BotCore):
 
                             if self.DEBUG:
                                 self.log("Current round", current_round) # Only print current round once
+    
+    @property
+    def baseXPGain(self):
+        """
+            TODO: Calculate base xp gain
+            https://github.com/hemisemidemipresent/cyberquincy/blob/dd41deb3fe44f0812331649c541344005b360a59/helpers/heroes.js#L54-L93
+        """
+        return None
+            
 
     @property
     def abilityRounds(self) -> tuple[int]:
         """
-            Will return a list max 3 of rounds that all hero abilities should be unlocked
-        
+            Will return a list rounds that all hero abilities should be unlocked
 
             NOTES: 
-                All heroes have a specific XP ratio. Heroes with a higher XP ratio require more XP to level up and therefore level up slower.
+                - All heroes have a specific XP ratio. Heroes with a higher XP ratio require more XP to level up and therefore level up slower.
+                - Heroes gain XP at the end of the round by the same formula as towers
+                - Each hero has multiple abilities (all have two with the exception of Ezili, Adora, and Admiral Brickell, who have three and Geraldo who has one) 
+                  that can be used to the player's advantage. The first ability is unlocked at level 3, and the second ability is unlocked at level 10; 
+                  for Ezili, Adora and Brickell, they gain their second ability at level 7 and third at level 10. 
+                  The highest level a hero can reach is 20. 
+                - Hero XP amount is calculate the same way as tower xp https://bloons.fandom.com/wiki/Experience_Points#BTD6
 
-                - All four base heroes (Quincy, Gwendolin, Striker Jones, Obyn Greenfoot) 
-                    as well as Etienne and Geraldo have an XP ratio of 1x.
-                - Ezili, Pat Fusty, Admiral Brickell, and Sauda have a 1.425x XP ratio.
-                - Benjamin and Psi have an XP ratio of 1.5x.
-                - Captain Churchill and Adora have a ratio of 1.71x.
+            For example:
+                - Obyn has a xp ratio of 1.0. He gets his abillity at round 3 and 10.
+                    If he is placed at round lvl 12 he will get his abilities at round 14 and 51
+
+            TODO: 
+                - Add support for energizer (Energizer is the only tower that increases levelling speed.)
+                - MK or support for everyone w/o MK? 
+                    - There are several Monkey Knowledge points that can affect hero levelling:
+                        - Self Taught Heroes: +10% XP
+                        - Monkey Education: +8% XP
+                        - Monkeys Together Strong: +5% XP
+                        - Scholarships: -10% cost
+                - Each map difficulty above beginner gives a 10% xp bonus, e.g. playing on expert gives you a 30% XP boost. 
         """
-        def xp_forumla(rounds, hero_placed_round):
-            # TODO: ADD XP_RATION
-            xp_ratio = 1.0
+        def xp_forumla(ability_levels_list, round_hero_placed):
+            if self.DEBUG:
+                self.log("Ability aqquired at levels: {}, Hero placed round: {}".format(ability_levels_list, round_hero_placed))
+
+            xp_ratio = static.hero_xp_ratio[self.settings["HERO"]]
+            bonus = 1.0
             # for for every ability
-            for ability_round in rounds:
-                xp_sum = static.hero_xp[ability_round]
-                while xp_sum < (static.hero_xp[ability_round] * xp_ratio):
-                    hero_placed_round += 1
-                    xp_sum += static.hero_xp_per_level[hero_placed_round]
+            for level_ability_unlocked in ability_levels_list:
+                if self.DEBUG:
+                    self.log("==Level that ability will be unlocked: {}".format(level_ability_unlocked))
 
-                # When xp_sum is greater than or equal to the xp needed for the next level, we have found the round
-                yield hero_placed_round
+                # reset hero abillity counter to the round the hero was placed
+                hero_abillity_counter = round_hero_placed
 
+                # Defined xp_sum to the amount of xp earned at the end of the round
+                accumilated_xp_sum = static.hero_xp_per_level[hero_abillity_counter]
 
+                # Calculate the total xp needed to reach ability level    
+                total_hero_xp_needed = 0
+                for hero_level, xp_gained_amount  in static.hero_xp.items():
+                    if hero_level <= level_ability_unlocked:
+                        total_hero_xp_needed += xp_gained_amount 
+                total_hero_xp_needed *= xp_ratio
+                        
+                print("total hero xp needed {} for ability gained from level {}".format(total_hero_xp_needed, level_ability_unlocked))
+                
+                while accumilated_xp_sum < total_hero_xp_needed:
 
-        # TODO: Fix this, it's not gonna work as intended maybe
-        round_hero_placed = 0
+                    # XP gain undefined after round 100
+                    if hero_abillity_counter > 100:
+                        break
+                    
+                    hero_abillity_counter += 1
+                    xp_gain = static.hero_xp_per_level[hero_abillity_counter] * bonus
+                    accumilated_xp_sum += xp_gain
+
+                    if self.DEBUG:
+                        self.log("added {} to xp_sum".format(static.hero_xp_per_level[hero_abillity_counter]))
+                        self.log("\tRound since hero placed: {};\n\txp_sum: {};\n\trequired xp {}".format(hero_abillity_counter, accumilated_xp_sum, total_hero_xp_needed))
+                    
+
+                # When xp_sum is greater than to the xp needed for the next level, we have found the round
+                yield hero_abillity_counter
+
+        round_hero_placed = -1
         for round in self.game_plan.keys():
             for instruction in self.game_plan[round]:
-                if "PLACE_TOWER" in instruction:
+                if instruction["INSTRUCTION_TYPE"] == "PLACE_TOWER":
                     if instruction["ARGUMENTS"]["MONKEY"] == "HERO":
                         round_hero_placed = int(round)
                         break
-        
-        # Heroes gain XP at the end of the round by the same formula as towers
-        # So add 1 to the round the hero is placed to get the round the ability is avaliable
-        # Round that the hero is placed
-        abilities_round = [ round + 1 for round in xp_forumla(static.hero_ability_unlock[self.settings["HERO"]], round_hero_placed) ]
-        
+        abilities_round = [ round for round in xp_forumla(static.hero_ability_unlock[self.settings["HERO"]], round_hero_placed) ]
+        if self.DEBUG:
+            assert [14, 51] == xp_forumla([3, 10], 12), "Example rounds not correct with expected output"
+            self.log("Hero abilities will be unlocked on rounds rounds: {}".format(abilities_round))
+
         return abilities_round
 
     def exit_bot(self): 
