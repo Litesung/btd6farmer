@@ -32,8 +32,17 @@ class BotUtils:
         try:
             if sys.platform == "win32":
                 ctypes.windll.shcore.SetProcessDpiAwareness(2) # DPI indipendent
+            
             tk = tkinter.Tk()
             self.width, self.height = tk.winfo_screenwidth(), tk.winfo_screenheight()
+
+            # if sys.platform == "linux":
+            #     import subprocess
+            #     output = subprocess.Popen('xrandr | grep "primary" | grep -Eo "[0-9][0-9][0-9][0-9]x[0-9][0-9][0-9][0-9]" | cut -d" " -f4',shell=True, stdout=subprocess.PIPE).communicate()[0]
+            #     if len(output) > 0:
+            #         output = output.decode("utf-8").replace("\n", "")
+            #         self.width, self.height = map(int, output.split("x"))
+
         except Exception as e:
             raise Exception("Could not retrieve monitor resolution")
 
@@ -326,7 +335,6 @@ class BotUtils:
 
             Returns a list of cordinates to where openCV found matches of the template on the screenshot taken
         """
-
         monitor = {'top': 0, 'left': 0, 'width': self.width, 'height': self.height} if region is None else region
 
         if  0.0 > confidence <= 1.0:
@@ -336,7 +344,9 @@ class BotUtils:
 
             # Load the taken screenshot into a opencv img object
             img = np.array(sct.grab(monitor))
-            screenshot = self._load_img(img) 
+            screenshot = self._load_img(img)
+            if self.DEBUG:
+                cv2.imwrite("test.png", screenshot) 
 
             if region:
                 screenshot = screenshot[region[1]:region[1]+region[3],
