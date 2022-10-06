@@ -94,6 +94,7 @@ hero_cooldowns = {
 
 # https://bloons.fandom.com/wiki/Experience_Points#BTD6_Heroes_XP
 # https://docs.google.com/spreadsheets/d/1s1xFOiWo_BgglLIftcqrfTD9Fnt4CUT1vOXYR1SwpFs/edit#gid=0
+# XP needed total for each level
 hero_xp = {
     1: 180,
     2: 460,
@@ -114,6 +115,45 @@ hero_xp = {
     17: 20700,
     18: 16470,
     19: 17280,
+}
+
+# hero_xp = {
+#     1:    180,
+#     2:    640,
+#     3:    1640,
+#     4:    3500,
+#     5:    6780,
+#     6:    11960,
+#     7:    20280,
+#     8:    29660,
+#     9:    43280,
+#     10:   59660,
+#     11:   74060,
+#     12:   90710,
+#     13:   105650,
+#     14:   122030,
+#     15:   139850,
+#     16:   159110,
+#     17:   179810,
+#     18:   196280,
+#     19:   213560,
+# }
+
+hero_xp_ratio = {
+    "QUINCY"            : 1.0,
+    "GWENDOLIN"         : 1.0,
+    "STRIKER_JONES"     : 1.0,
+    "OBYN"              : 1.0,
+    "CAPTAIN_CHURCHILL" : 1.71,
+    "BENJAMIN"          : 1.5,
+    "EZILI"             : 1.425,
+    "PAT_FUSTY"         : 1.425,
+    "ADORA"             : 1.71,
+    "ADMIRAL_BRICKELL"  : 1.425,
+    "ETIENNE"           : 1.0,
+    "SAUDA"             : 1.425,
+    "PSI"               : 1.5,
+    "GERALDO"           : 1.0
 }
 
 hero_xp_per_level = {
