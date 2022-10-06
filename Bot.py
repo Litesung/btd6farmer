@@ -473,6 +473,13 @@ class BotCore(BotLog, BotUtils):
         BotLog.__init__(self)
         BotUtils.__init__(self)
 
+    @property
+    def hero(self) -> str:
+        """
+            Returns the hero name
+        """
+        return self.settings["HERO"]
+
     def _load_json(self, path):
         """
             Will read the @path as a json file load into a dictionary.
@@ -556,22 +563,25 @@ class Bot(BotCore):
             if current_round != None:
                 # Saftey net; use abilites
                 # TODO: Calculate round dynamically, base on which round hero has been placed.
-                if self.settings["HERO"] != "GERALDO": # geraldo doesn't any ability
-                    cooldowns = static.hero_cooldowns[self.settings["HERO"]]
+                cooldowns = static.hero_cooldowns[self.settings["HERO"]]
 
-                    if current_round >= 7 and self.abilityAvaliabe(ability_one_timer, cooldowns[0]):
+                abillty_one_round, abillty_two_round, abillty_three_round = self.abilityRounds
+
+                if len(cooldowns) >= 1:
+                    if current_round >= abillty_one_round and self.abilityAvaliabe(ability_one_timer, cooldowns[0]):
                         self.press_key("1")
                         ability_one_timer = time.time()
-                    
+                
+                if len(cooldowns) >= 2:
                     # skip if ezili or adora, their lvl 7 ability is useless
-                    if current_round >= 31 and self.abilityAvaliabe(ability_two_timer, cooldowns[1]) and (self.settings["HERO"] != "EZILI" and "ADORA"):
+                    if current_round >= abillty_two_round and self.abilityAvaliabe(ability_two_timer, cooldowns[1]) and (self.settings["HERO"] != "EZILI" and "ADORA"):
                         self.press_key("2")
                         ability_two_timer = time.time()
-                    
-                    if len(cooldowns) == 3:
-                        if current_round >= 53 and self.abilityAvaliabe(ability_three_timer, cooldowns[2]):
-                            self.press_key("3")
-                            ability_three_timer = time.time()
+                
+                if len(cooldowns) >= 3:
+                    if current_round >= abillty_three_round and self.abilityAvaliabe(ability_three_timer, cooldowns[2]):
+                        self.press_key("3")
+                        ability_three_timer = time.time()
 
                 # Check for round in game plan
                 if str(current_round) in self.game_plan:
@@ -591,6 +601,36 @@ class Bot(BotCore):
 
                             if self.DEBUG:
                                 self.log("Current round", current_round) # Only print current round once
+
+    @property
+    def abilityRounds(self) -> tuple[int]:
+
+        """
+        All heroes have a specific XP ratio. Heroes with a higher XP ratio require more XP to level up and therefore level up slower.
+
+            - All four base heroes (Quincy, Gwendolin, Striker Jones, Obyn Greenfoot) 
+                as well as Etienne and Geraldo have an XP ratio of 1x.
+            - Ezili, Pat Fusty, Admiral Brickell, and Sauda have a 1.425x XP ratio.
+            - Benjamin and Psi have an XP ratio of 1.5x.
+            - Captain Churchill and Adora have a ratio of 1.71x.
+        """
+
+        # TODO: Fix this, it's not gonna work as intended
+        round_hero_placed = [round for round in self.game_plan if "PLACE_TOWER" in self.game_plan[round]][0]
+        # for round in self.game_plan:
+        #     if "PLACE_TOWER" in self.game_plan[round]:
+        #         if self.game_plan[round]["ARGUMENTS"]["MONKEY"] == "HERO":
+        #             round_hero_placed = round
+        #             break
+        tower_xp_formula = None
+        
+        # Heroes gain XP at the end of the round by the same formula as towers
+        # So add 1 to the round the hero is placed to get the round the ability is avaliable
+        ability_one = 0 + 1
+        ability_two = 0 + 1
+        ability_three = 0 + 1
+
+        return 7, 31, 53
 
     def exit_bot(self): 
         self.running = False
