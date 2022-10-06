@@ -609,14 +609,11 @@ class Bot(BotCore):
         # Convert upgrade_path to something usable
         top, middle, bottom = upgrade_path
         
-        for _ in range(top):
-            self.press_key(static.upgrade_keybinds["top"])
+        self.press_key(static.upgrade_keybinds["top"], amount=top)
 
-        for _ in range(middle):
-            self.press_key(static.upgrade_keybinds["middle"])
+        self.press_key(static.upgrade_keybinds["middle"], amount=middle)
 
-        for _ in range(bottom):
-            self.press_key(static.upgrade_keybinds["bottom"])
+        self.press_key(static.upgrade_keybinds["bottom"], amount=bottom)
         
         self.press_key("esc")
 
