@@ -521,6 +521,8 @@ class Bot(BotCore):
         
         finished = False
         middle_of_screen = (0.5, 0.5)
+
+        abillty_one_round, abillty_two_round, abillty_three_round = self.abilityRounds
         
         # main ingame loop
         while not finished:
@@ -565,8 +567,6 @@ class Bot(BotCore):
                 # TODO: Calculate round dynamically, base on which round hero has been placed.
                 cooldowns = static.hero_cooldowns[self.settings["HERO"]]
 
-                abillty_one_round, abillty_two_round, abillty_three_round = self.abilityRounds
-
                 if len(cooldowns) >= 1:
                     if current_round >= abillty_one_round and self.abilityAvaliabe(ability_one_timer, cooldowns[0]):
                         self.press_key("1")
@@ -604,33 +604,49 @@ class Bot(BotCore):
 
     @property
     def abilityRounds(self) -> tuple[int]:
-
         """
-        All heroes have a specific XP ratio. Heroes with a higher XP ratio require more XP to level up and therefore level up slower.
+            Will return a list max 3 of rounds that all hero abilities should be unlocked
+        
 
-            - All four base heroes (Quincy, Gwendolin, Striker Jones, Obyn Greenfoot) 
-                as well as Etienne and Geraldo have an XP ratio of 1x.
-            - Ezili, Pat Fusty, Admiral Brickell, and Sauda have a 1.425x XP ratio.
-            - Benjamin and Psi have an XP ratio of 1.5x.
-            - Captain Churchill and Adora have a ratio of 1.71x.
+            NOTES: 
+                All heroes have a specific XP ratio. Heroes with a higher XP ratio require more XP to level up and therefore level up slower.
+
+                - All four base heroes (Quincy, Gwendolin, Striker Jones, Obyn Greenfoot) 
+                    as well as Etienne and Geraldo have an XP ratio of 1x.
+                - Ezili, Pat Fusty, Admiral Brickell, and Sauda have a 1.425x XP ratio.
+                - Benjamin and Psi have an XP ratio of 1.5x.
+                - Captain Churchill and Adora have a ratio of 1.71x.
         """
+        def xp_forumla(rounds, hero_placed_round):
+            # TODO: ADD XP_RATION
+            xp_ratio = 1.0
+            # for for every ability
+            for ability_round in rounds:
+                xp_sum = static.hero_xp[ability_round]
+                while xp_sum < (static.hero_xp[ability_round] * xp_ratio):
+                    hero_placed_round += 1
+                    xp_sum += static.hero_xp_per_level[hero_placed_round]
 
-        # TODO: Fix this, it's not gonna work as intended
-        round_hero_placed = [round for round in self.game_plan if "PLACE_TOWER" in self.game_plan[round]][0]
-        # for round in self.game_plan:
-        #     if "PLACE_TOWER" in self.game_plan[round]:
-        #         if self.game_plan[round]["ARGUMENTS"]["MONKEY"] == "HERO":
-        #             round_hero_placed = round
-        #             break
-        tower_xp_formula = None
+                # When xp_sum is greater than or equal to the xp needed for the next level, we have found the round
+                yield hero_placed_round
+
+
+
+        # TODO: Fix this, it's not gonna work as intended maybe
+        round_hero_placed = 0
+        for round in self.game_plan.keys():
+            for instruction in self.game_plan[round]:
+                if "PLACE_TOWER" in instruction:
+                    if instruction["ARGUMENTS"]["MONKEY"] == "HERO":
+                        round_hero_placed = int(round)
+                        break
         
         # Heroes gain XP at the end of the round by the same formula as towers
         # So add 1 to the round the hero is placed to get the round the ability is avaliable
-        ability_one = 0 + 1
-        ability_two = 0 + 1
-        ability_three = 0 + 1
-
-        return 7, 31, 53
+        # Round that the hero is placed
+        abilities_round = [ round + 1 for round in xp_forumla(static.hero_ability_unlock[self.settings["HERO"]], round_hero_placed) ]
+        
+        return abilities_round
 
     def exit_bot(self): 
         self.running = False
