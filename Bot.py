@@ -4,20 +4,23 @@ import sys
 import time
 
 from BotUtils import BotUtils
+from Static import Generic
 
 
 class Bot(BotUtils):
     def __init__(self, user_args):
-        BotUtils.__init__(user_args)
+        BotUtils.__init__(self, user_args)
         
         self.running = True
         self.fast_forward = True
+
+        # TODO: Instead of passing in value to some methods, use this variable it and change it
         self.has_won = False
 
         # Defing a lamda function that can be used to get a path to a specific image
         # self._image_path = lambda image, root_dir=self.support_dir, height=self.height : root_dir/f"{height}_{image}.png"
         self._image_path = lambda image_filename: self.get_resource_dir("assets")/f"{image_filename}.png"
-     
+
 
     # Different methods for different checks all wraps over _find()
     def menu_check(self):
@@ -59,7 +62,7 @@ class Bot(BotUtils):
         return self._find(self._image_path("round_area"), return_cords=True, center_on_found=False)
 
     def initilize(self):
-        if self.DEBUG:
+        if self.debug_mode:
             self.log("RUNNING IN DEBUG MODE, DEBUG FILES WILL BE GENERATED")
 
         self.press_key("alt")
@@ -87,7 +90,7 @@ class Bot(BotUtils):
             # Check for finished or failed game
             if self.defeat_check():
                 
-                if self.DEBUG:
+                if self.debug_mode:
                     print("Defeat detected on round {}; exiting level".format(current_round))
                     self.log_stats(did_win=False, match_time=(time.time()-self.game_start_time))
                 if self.RESTART:
@@ -100,7 +103,7 @@ class Bot(BotUtils):
 
             elif self.victory_check():
 
-                if self.DEBUG:
+                if self.debug_mode:
                     print("Victory detected; exiting level") 
                     self.log_stats(did_win=True, match_time=(time.time()-self.game_start_time))
                 if self.RESTART:
@@ -139,7 +142,7 @@ class Bot(BotUtils):
 
                             instruction["DONE"] = True
 
-                            if self.DEBUG:
+                            if self.debug_mode:
                                 self.log("Current round", current_round) # Only print current round once
 
     def exit_bot(self): 
@@ -320,7 +323,7 @@ class Bot(BotUtils):
 
     def check_for_collection_crates(self):
         if self.collection_event_check():
-            if self.DEBUG:
+            if self.debug_mode:
                 self.log("easter collection detected")
                 # take screenshot of loc and save it to the folder
 
@@ -355,10 +358,10 @@ class Bot(BotUtils):
             
     # select hero if not selected
     def hero_select(self):
-        if not self.hero_check(self.settings["HERO"]):
-            self.log(f"Selecting {self.settings['HERO']}")
+        if not self.hero_check(self.hero.name):
+            self.log(f"Selecting {self.hero.name}")
             self.click("HERO_SELECT")
-            self.click(static.hero_positions[self.settings["HERO"]], move_timeout=0.2)
+            self.click(self.hero.cords, move_timeout=0.2)
             self.click("CONFIRM_HERO")
             self.press_key("esc")
 
@@ -367,7 +370,7 @@ class Bot(BotUtils):
             self.click("VICTORY_CONTINUE")
             time.sleep(2)
             self.click("VICTORY_HOME")
-        elif self.settings["GAMEMODE"] == "CHIMPS_MODE":
+        elif self.map.gamemode == "CHIMPS_MODE":
             self.click("DEFEAT_HOME_CHIMPS")
             time.sleep(2)
         else:
@@ -387,7 +390,7 @@ class Bot(BotUtils):
             time.sleep(1)
             self.click("RESTART_WIN")
             self.click("RESTART_CONFIRM")
-        elif self.settings["GAMEMODE"] == "CHIMPS_MODE":
+        elif self.map.gamemode == "CHIMPS_MODE":
             self.click("RESTART_DEFEAT_CHIMPS")
             self.click("RESTART_CONFIRM")
             time.sleep(2)
@@ -399,32 +402,29 @@ class Bot(BotUtils):
         self.wait_for_loading() # wait for loading screen
 
     def select_map(self):
-        map_page = static.maps[self.settings["MAP"]][0]
-        map_index = static.maps[self.settings["MAP"]][1]
-        
         time.sleep(1)
 
         self.click("HOME_MENU_START")
-        self.click("EXPERT_SELECTION")
+        self.click("EXPERT_SELECTION") # TODO: IS THIS NEEDED?
         
         self.click("BEGINNER_SELECTION") # goto first page
 
         # click to the right page
-        self.click("RIGHT_ARROW_SELECTION", amount=(map_page - 1), timeout=0.1)
+        self.click("RIGHT_ARROW_SELECTION", amount=(self.map.page - 1), timeout=0.1)
 
-        self.click("MAP_INDEX_" + str(map_index)) # Click correct map
-        self.click(self.settings["DIFFICULTY"]) # Select Difficulty
-        self.click(self.settings["GAMEMODE"]) # Select Gamemode
+        self.click(self.map.cords) # Click correct map
+        self.click(self.map.map_difficulty) # Select Difficulty
+        self.click(self.map.gamemode_cords) # Select Gamemode
         self.click("OVERWRITE_SAVE")
 
         self.wait_for_loading() # wait for loading screen
 
         # Only need to press confirm button if we play chimps or impoppable
-        if self.settings["GAMEMODE"] == "CHIMPS_MODE" or \
-           self.settings["GAMEMODE"] == "IMPOPPABLE"  or \
-           self.settings["GAMEMODE"] == "DEFLATION"   or \
-           self.settings["GAMEMODE"] == "APOPALYPSE"  or \
-           self.settings["GAMEMODE"] == "HALF_CASH":
+        if self.map.gamemode == "CHIMPS_MODE" or \
+           self.map.gamemode == "IMPOPPABLE"  or \
+           self.map.gamemode == "DEFLATION"   or \
+           self.map.gamemode == "APOPALYPSE"  or \
+           self.map.gamemode == "HALF_CASH":
             self.press_key("esc", timeout=1)
             # self.click(self.settings["DIFFICULTY"])
             # self.click("CONFIRM_CHIMPS")
@@ -433,7 +433,7 @@ class Bot(BotUtils):
         still_loading = True
 
         while still_loading:
-            if self.DEBUG:
+            if self.debug_mode:
                 self.log("Waiting for loading screen..")
             
             time.sleep(0.2) # add a short timeout to avoid spamming the cpu
