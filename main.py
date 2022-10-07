@@ -16,6 +16,7 @@ def main(argument_parser):
 
     # Retrives the gameplan from the command line and makes a Path object out of it
     gameplan_path = (Path(__file__).resolve().parent / Path(args["path"]) )
+    args["path"] = gameplan_path
 
     # Verify directory exist.
     if not gameplan_path.exists():
@@ -39,7 +40,7 @@ def main(argument_parser):
     waiting_for_home = False
 
     while waiting_for_home is False:
-        if bot.DEBUG:
+        if bot.debug_mode:
             print("Waiting for Home screen..")
         time.sleep(0.2) # add a short timeout to avoid spamming the cpu
         waiting_for_home = bot.home_menu_check()
