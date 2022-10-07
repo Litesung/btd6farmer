@@ -8,11 +8,11 @@ from Exceptions import FailSafe
 import mouse
 
 
-def main(arg_parser):
+def main(argument_parser):
     def no_gameplan_exception():
         raise Exception("No valid argument for directory.. 'python main.py --gameplan_path <directory to gameplan>'")
 
-    args = vars(arg_parser.parse_args())
+    args = vars(argument_parser.parse_args())
 
     # Retrives the gameplan from the command line and makes a Path object out of it
     gameplan_path = (Path(__file__).resolve().parent / Path(args["path"]) )
@@ -26,11 +26,7 @@ def main(arg_parser):
         print("Not a directory")
         no_gameplan_exception()
     
-    bot = Bot(instruction_path=Path(args["path"]), 
-            debug_mode=(args['debug']), 
-            verbose_mode=(args['verbose']), 
-            restart_mode=(args['restart'])
-        )
+    bot = Bot(args)
         
     print("Setting up Bot...")
     print("Using gameplan located in: " + str(gameplan_path))
