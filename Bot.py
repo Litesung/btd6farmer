@@ -487,7 +487,7 @@ class BotCore(BotLog, BotUtils):
 
 
 class Bot(BotCore):
-    def __init__(self, instruction_path, debug_mode=False, verbose_mode=False, restart_mode=False):
+    def __init__(self, instruction_path, debug_mode=False, verbose_mode=False, restart_mode=False, sandbox_mode=False):
         super().__init__(instruction_path)
         
         self.start_time = time.time()
@@ -495,6 +495,7 @@ class Bot(BotCore):
         self.DEBUG = debug_mode
         self.VERBOSE = verbose_mode
         self.RESTART = restart_mode
+        self.SANDBOX = sandbox_mode
         self.game_start_time = time.time()
         self.fast_forward = True
 
@@ -777,6 +778,7 @@ class Bot(BotCore):
                 self.log("easter collection detected")
                 # take screenshot of loc and save it to the folder
 
+            ## TODO: rewrite this?
             self.click("EASTER_COLLECTION") #DUE TO EASTER EVENT:
             time.sleep(1)
             self.click("LEFT_INSTA") # unlock insta
