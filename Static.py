@@ -1,4 +1,5 @@
 from types import GeneratorType
+from typing import List
 import numpy as np
 
 class Static:
@@ -145,62 +146,72 @@ class Static:
                 19: 17280,
             },
             "BUTTON_CORDS": {
-                "HOME_MENU_START"           : [ 0.438671875 , 0.8666666666666667 ],
-                "EXPERT_SELECTION"          : [ 0.69453125 , 0.9055555555555556 ],
-                "BEGINNER_SELECTION"        : [ 0.30390625 , 0.9055555555555556 ],
-                "RIGHT_ARROW_SELECTION"     : [ 0.856640625 , 0.4041666666666667 ],
-                "DARK_CASTLE"               : [ 0.5546875 , 0.24305555555555555 ],
-                "MAP_INDEX_1"               : [ 0.2734375 , 0.24305555555555555 ],
-                "MAP_INDEX_2"               : [ 0.5546875 , 0.24305555555555555 ],
-                "MAP_INDEX_3"               : [ 0.78125 , 0.24305555555555555 ],
-                "MAP_INDEX_4"               : [ 0.2734375 , 0.4861111111111111 ],
-                "MAP_INDEX_5"               : [ 0.5546875 , 0.4861111111111111 ],
-                "MAP_INDEX_6"               : [ 0.78125 , 0.4861111111111111 ],
-                "HARD_MODE"                 : [ 0.675390625 , 0.3902777777777778 ],
-                "EASY_MODE"                 : [ 0.284765625 , 0.3902777777777778 ],
-                "MEDIUM_MODE"               : [ 0.480078125 , 0.3902777777777778 ],
-                "CHIMPS_MODE"               : [ 0.835546875 , 0.6805555555555556 ],
-                "DEFLATION"                 : [ 0.662890625 , 0.4166666666666667 ],
-                "SANDBOX_EASY"              : [ 0.5015625 , 0.6770833333333334 ],
-                "SANDBOX_MEDIUM"            : [ 0.667578125 , 0.6791666666666667 ],
-                "SANDBOX_HARD"              : [ 0.1453125 , 0.5458333333333333 ],
-                "PRIMARY_ONLY"              : [ 0.48671875 , 0.4152777777777778 ],
-                "APOPALYPSE"                : [ 0.667578125 , 0.4048611111111111 ],
-                "REVERSE"                   : [ 0.500390625 , 0.6798611111111111 ],
-                "MILITARY_ONLY"             : [ 0.4984375 , 0.41458333333333336 ],
-                "MAGIC_MONKEYS_ONLY"        : [ 0.49609375 , 0.4097222222222222 ],
-                "DOUBLE_HP_MOABS"           : [ 0.65859375 , 0.40902777777777777 ],
-                "HALF_CASH"                 : [ 0.83671875 , 0.40694444444444444 ],
-                "ALTERNATE_BLOONS_ROUNDS"   : [ 0.501171875 , 0.6680555555555555 ],
-                "IMPOPPABLE"                : [ 0.660546875 , 0.6791666666666667 ],
-                "CHIMPS"                    : [ 0.835546875 , 0.6805555555555556 ],
-                "STANDARD_GAME_MODE"        : [ 0.330859375 , 0.5416666666666666 ],
-                "OVERWRITE_SAVE"            : [ 0.59375 , 0.6763888888888889 ],
-                "VICTORY_CONTINUE"          : [ 0.501171875 , 0.84375 ],
-                "VICTORY_HOME"              : [ 0.366796875 , 0.7805555555555556 ],
-                "DEFEAT_HOME"               : [ 0.29453125 , 0.7520833333333333 ],
-                "DEFEAT_HOME_CHIMPS"        : [ 0.36328125 , 0.7520833333333333 ],
-                "EASTER_COLLECTION"         : [ 0.499609375 , 0.6326388888888889 ],
-                "F_LEFT_INSTA"              : [ 0.3390625 , 0.5013888888888889 ],
-                "F_RIGHT_INSTA"             : [ 0.65625 , 0.5013888888888889 ],
-                "LEFT_INSTA"                : [ 0.41953125 , 0.5034722222222222 ],
-                "RIGHT_INSTA"               : [ 0.577734375 , 0.5027777777777778 ],
-                "MID_INSTA"                 : [ 0.4984375 , 0.5048611111111111 ],
-                "EASTER_CONTINUE"           : [ 0.5 , 0.9236111111111112 ],
-                "EASTER_EXIT"               : [ 0.0390625 , 0.06458333333333334 ],
-                "QUIT_HOME"                 : [ 0.43984375 , 0.7881944444444444 ],
-                "HERO_SELECT"               : [ 0.312109375 , 0.8833333333333333 ],
-                "CONFIRM_HERO"              : [ 0.587890625 , 0.5722222222222222 ],
-                "TARGET_BUTTON_MORTAR"      : [ 0.745703125 , 0.34097222222222223 ],
-                "ABILLITY_ONE"              : [ 0.098828125 , 0.9576388888888889 ],
-                "ABILLITY_TWO"              : [ 0.144140625 , 0.95625 ],
-                "FREEPLAY"                  : [ 0.629296875 , 0.7722222222222223 ],
-                "OK_MIDDLE"                 : [ 0.5 , 0.6965277777777777 ],
-                "RESTART_WIN"               : [ 0.551953125 , 0.7597222222222222 ],
-                "RESTART_CONFIRM"           : [ 0.591796875 , 0.6694444444444444 ],
-                "RESTART_DEFEAT"            : [ 0.430859375 , 0.7520833333333333 ],
-                "RESTART_DEFEAT_CHIMPS"     : [ 0.5 , 0.7597222222222222 ],
-                "CONFIRM_CHIMPS"            : [ 0.500390625 , 0.6805555555555556 ]
+                "MAP_DIFFICULTIES": {   
+                    "EASY_MODE"                 : [ 0.284765625 , 0.3902777777777778 ],
+                    "MEDIUM_MODE"               : [ 0.480078125 , 0.3902777777777778 ],
+                    "HARD_MODE"                 : [ 0.675390625 , 0.3902777777777778 ],
+                },
+                "GAMEMODES": {
+                    "CHIMPS_MODE"               : [ 0.835546875 , 0.6805555555555556 ],
+                    "DEFLATION"                 : [ 0.662890625 , 0.4166666666666667 ],
+                    "SANDBOX_EASY"              : [ 0.5015625   , 0.6770833333333334 ],
+                    "SANDBOX_MEDIUM"            : [ 0.667578125 , 0.6791666666666667 ],
+                    "SANDBOX_HARD"              : [ 0.1453125   , 0.5458333333333333 ],
+                    "PRIMARY_ONLY"              : [ 0.48671875  , 0.4152777777777778 ],
+                    "APOPALYPSE"                : [ 0.667578125 , 0.4048611111111111 ],
+                    "REVERSE"                   : [ 0.500390625 , 0.6798611111111111 ],
+                    "MILITARY_ONLY"             : [ 0.4984375   , 0.41458333333333336],
+                    "MAGIC_MONKEYS_ONLY"        : [ 0.49609375  , 0.4097222222222222 ],
+                    "DOUBLE_HP_MOABS"           : [ 0.65859375  , 0.40902777777777777],
+                    "HALF_CASH"                 : [ 0.83671875  , 0.40694444444444444],
+                    "ALTERNATE_BLOONS_ROUNDS"   : [ 0.501171875 , 0.6680555555555555 ],
+                    "IMPOPPABLE"                : [ 0.660546875 , 0.6791666666666667 ],
+                    "CHIMPS"                    : [ 0.835546875 , 0.6805555555555556 ],
+                    "STANDARD_GAME_MODE"        : [ 0.330859375 , 0.5416666666666666 ],
+                },
+                "MAP_CORDS": {
+                    1               : [ 0.2734375 , 0.24305555555555555 ],
+                    2               : [ 0.5546875 , 0.24305555555555555 ],
+                    3               : [ 0.78125   , 0.24305555555555555 ],
+                    4               : [ 0.2734375 , 0.4861111111111111 ],
+                    5               : [ 0.5546875 , 0.4861111111111111 ],
+                    6               : [ 0.78125   , 0.4861111111111111 ],
+                },
+                "MAP_MENU": {
+                    "HOME_MENU_START"           : [ 0.438671875 , 0.8666666666666667 ],
+                    "EXPERT_SELECTION"          : [ 0.69453125 , 0.9055555555555556 ],
+                    "BEGINNER_SELECTION"        : [ 0.30390625 , 0.9055555555555556 ],
+                    "RIGHT_ARROW_SELECTION"     : [ 0.856640625 , 0.4041666666666667 ],
+                    "OVERWRITE_SAVE"            : [ 0.59375 , 0.6763888888888889 ],
+
+                },
+                "INGAME_MENU": {
+                    "VICTORY_CONTINUE"          : [ 0.501171875 , 0.84375 ],
+                    "VICTORY_HOME"              : [ 0.366796875 , 0.7805555555555556 ],
+                    "DEFEAT_HOME"               : [ 0.29453125 , 0.7520833333333333 ],
+                    "DEFEAT_HOME_CHIMPS"        : [ 0.36328125 , 0.7520833333333333 ],
+                    "RESTART_WIN"               : [ 0.551953125 , 0.7597222222222222 ],
+                    "RESTART_CONFIRM"           : [ 0.591796875 , 0.6694444444444444 ],
+                    "RESTART_DEFEAT"            : [ 0.430859375 , 0.7520833333333333 ],
+                    "RESTART_DEFEAT_CHIMPS"     : [ 0.5 , 0.7597222222222222 ],
+                    "CONFIRM_CHIMPS"            : [ 0.500390625 , 0.6805555555555556 ],
+                    "FREEPLAY"                  : [ 0.629296875 , 0.7722222222222223 ],
+                    "OK_MIDDLE"                 : [ 0.5 , 0.6965277777777777 ],
+                },
+                "COLLECTION_EVENT": {
+                    "EVENT_BUTTON"              : [ 0.499609375 , 0.6326388888888889 ],
+                    "F_LEFT_INSTA"              : [ 0.3390625 , 0.5013888888888889 ],
+                    "F_RIGHT_INSTA"             : [ 0.65625 , 0.5013888888888889 ],
+                    "LEFT_INSTA"                : [ 0.41953125 , 0.5034722222222222 ],
+                    "RIGHT_INSTA"               : [ 0.577734375 , 0.5027777777777778 ],
+                    "MID_INSTA"                 : [ 0.4984375 , 0.5048611111111111 ],
+                    "CONTINUE"                  : [ 0.5 , 0.9236111111111112 ],
+                },
+                "HERO" : {
+                    "HERO_SELECT"               : [ 0.312109375 , 0.8833333333333333 ],
+                    "CONFIRM_HERO"              : [ 0.587890625 , 0.5722222222222222 ],
+                }
+
             },
             "MAPS": {
                 # "NAME" : {
@@ -464,9 +475,6 @@ class Static:
         return self._data["KEYBINDS"]["TOWERS"]
 
     @property
-    def hero_xp_per_level(self):
-        return self._data["hero_xp"]
-    @property
     def button_locations(self):
         return self._data["BUTTON_CORDS"]
 
@@ -478,14 +486,7 @@ class Static:
     def upgrade_keybinds(self):
         return self._data["KEYBINDS"]["UPGRADE"]
 
-    def get_map_page(self, map):
-        return self._data["MAPS"][map]["LOCATION"][0]
 
-    def get_map_index(self, map):
-        return self._data["MAPS"][map]["LOCATION"][1]
-
-    def get_map_difficulty(self, map):
-        return self._data["MAPS"][map]["DIFFICULTY"]
 
 
     # Index, regular targets, spike factory targets
@@ -499,35 +500,36 @@ class Hero(Static):
     """
     def __init__(self, hero_name:str, gameplan:dict, _map:object):
         
-        self.xp_ratio            = Static.heros[hero_name]["XP_RATIO"]
-        self.menu_location       = Static.heros[hero_name]["MENU_LOCATION"]
-        self.cooldown_time       = Static.heros[hero_name]["COOLDOWN"]
-        self.ability_levels_unlocked_list = Static.heros[hero_name]["ABILITY_UNLOCK"]
-
-
-        self.xp_map = self.xp_gained_per_round(_map)
-        self.ability_round_avaliable = [_round for _round in self.abilies_available]
-        self.round_hero_placed = 0
+        self.xp_ratio                     = Static._data["HEROS"][hero_name]["XP_RATIO"]
+        self.menu_location                = Static._data["HEROS"][hero_name]["MENU_LOCATION"]
+        self.cooldown_time                = Static._data["HEROS"][hero_name]["COOLDOWN"]
+        self.ability_levels_unlocked_list = Static._data["HEROS"][hero_name]["ABILITY_UNLOCK"]
 
         self.round_placed = self.get_round_placed(gameplan)
+        self.xp_map = self.xp_gained_per_round(_map)
+
+        self.ability_round_avaliable = [_round for _round in self.abilies_available]
+
+        self.name = hero_name
 
     def get_round_placed(self, gameplan):
-        for round in gameplan.keys():
-            for instruction in gameplan[round]:
+        for _round in gameplan.keys():
+            for instruction in gameplan[_round]:
                 if instruction["INSTRUCTION_TYPE"] == "PLACE_TOWER":
                     if instruction["ARGUMENTS"]["MONKEY"] == "HERO":
-                        return int(round)
+                        return int(_round)
+    
     @property
     def cooldown(self):
         return self.cooldown_time
-    
+
     @property
-    def xp_ratio(self):
-        return self.xp_ratio
-    
+    def cords(self):
+        return Static._data["HEROS"][self.name]["MENU_LOCATION"]
+
     @property
-    def round_placed(self):
-        return self.round_placed
+    def xp_per_level(self):
+        return Static._data["HERO_XP"]
 
     def xp_gained_per_round(self, map):
         """
@@ -540,10 +542,10 @@ class Hero(Static):
         """
 
         LEVELING_MAP_DIFFICULTY_MODIFIERS = {
-            1: 1.0,   # "BEGINNER"
-            2: 1.1, # "INTERMEDIATE"
-            3: 1.2, # "ADVANCED"
-            4: 1.3, # "EXPERT"
+            1: 1.0,  # "BEGINNER"
+            2: 1.1,  # "INTERMEDIATE"
+            3: 1.2,  # "ADVANCED"
+            4: 1.3,  # "EXPERT"
         }
 
         ENERGIZER_MODIFIER = 1
@@ -606,7 +608,7 @@ class Hero(Static):
 
             # Calculate the total xp needed to reach ability level    
             total_hero_xp_needed = 0
-            for hero_level, xp_gained_amount in Static.hero_xp_per_level.items():
+            for hero_level, xp_gained_amount in self.xp_per_level.items():
                 if hero_level < level_ability_unlocked:
                     total_hero_xp_needed += xp_gained_amount 
 
@@ -630,16 +632,50 @@ class Map(Static):
     """
         Gets values from static when init
     """
-    difficulty = None
-    map_name = None
-    map_page = 0
-    map_index = 0
 
-    def __init__(self, map_name):
+    def __init__(self, map_name, gamemode, difficulty):
         self.map_name = map_name
-        self.difficulty = Static.get_map_difficulty(map_name)
-        self.map_page = Static.get_map_page(map_name)
-        self.map_index = Static.get_map_index(map_name)
+        self.__gamemode = gamemode
+        self.__difficulty = difficulty # Difficulty in the map
+
+    @property
+    def page(self):
+        return Static._data["MAPS"][self.map_name]["LOCATION"][0]
+
+    @property
+    def index(self):
+        return Static._data["MAPS"][self.map_name]["LOCATION"][1]
+
+    @property
+    def cords(self ):
+        """
+        """
+        return Static._data["BUTTON_CORDS"]["MAP_CORDS"][self.index]
+
+    @property
+    def difficulty(self) -> int:
+        """
+            Returns the difficulty of the map represented by an integer
+                1 = Beginner
+                2 = Intermediate
+                3 = Advanced
+                4 = Expert
+        """
+        return self._data["MAPS"][self.map_name]["DIFFICULTY"]
+    
+    @property
+    def map_difficulty(self) -> str:
+        """
+            Returns the map difficulty 
+
+            ### TODO: hardcode this to make the user only need to choose the gamemode
+
+        """
+        return Static._data["BUTTON_CORDS"]["MAP_DIFFICULTY"][self.__difficulty]
+
+    @property
+    def gamemode_cords(self) -> List[float]:
+        return Static._data["BUTTON_CORDS"]["GAMEMODES"][self.__gamemode]
 
 
 class Generic(Static):
@@ -651,3 +687,116 @@ class Generic(Static):
     @property
     def upgrade_keybinds(self):
         return Static._data["KEYBINDS"]["UPGRADE"]
+
+    @property
+    def home_menu_start(self):
+        return Static._data["BUTTON_CORDS"]["MAP_MENU"]["HOME_MENU_START"]
+    
+    # MAPS menu
+    @property
+    def expert_button(self):
+        return Static._data["BUTTON_CORDS"]["MAP_MENU"]["EXPERT_SELECTION"]
+
+
+    @property
+    def beginner_button(self):
+        return Static._data["BUTTON_CORDS"]["MAP_MENU"]["BEGINNER_SELECTION"]
+
+
+    @property
+    def right_arrow_button(self):
+        return Static._data["BUTTON_CORDS"]["MAP_MENU"]["RIGHT_ARROW_SELECTION"]
+
+
+    @property
+    def overwrite_save(self):
+        return Static._data["BUTTON_CORDS"]["MAP_MENU"]["OVERWRITE_SAVE"]
+
+    # Ingame buttons
+    @property
+    def victory_continue(self):
+        return Static._data["BUTTON_CORDS"]["INGAME_MENU"]["VICTORY_CONTINUE"]
+    
+    @property
+    def victory_home(self):
+        return Static._data["BUTTON_CORDS"]["INGAME_MENU"]["VICTORY_HOME"]
+
+    @property
+    def defeat_home(self):
+        return Static._data["BUTTON_CORDS"]["INGAME_MENU"]["DEFEAT_HOME"]
+
+    @property
+    def defeat_chimps_home(self):
+        return Static._data["BUTTON_CORDS"]["INGAME_MENU"]["DEFEAT_HOME_CHIMPS"]
+
+    @property
+    def restart_win(self):
+        return Static._data["BUTTON_CORDS"]["INGAME_MENU"]["RESTART_WIN"]
+
+    @property
+    def restart_confirm(self):
+        return Static._data["BUTTON_CORDS"]["INGAME_MENU"]["RESTART_CONFIRM"]
+
+    @property
+    def restart_defeat(self):
+        return Static._data["BUTTON_CORDS"]["INGAME_MENU"]["RESTART_DEFEAT"]
+
+    @property
+    def restart_defeat_chimps(self):
+        return Static._data["BUTTON_CORDS"]["INGAME_MENU"]["RESTART_DEFEAT_CHIMPS"]
+
+    @property
+    def confirm_chimps(self):
+        return Static._data["BUTTON_CORDS"]["INGAME_MENU"]["CONFIRM_CHIMPS"]
+
+    @property
+    def freeplay(self):
+        return Static._data["BUTTON_CORDS"]["INGAME_MENU"]["FREEPLAY"]
+
+    @property
+    def ok_middle(self):
+        return Static._data["BUTTON_CORDS"]["INGAME_MENU"]["OK_MIDDLE"]
+
+    # COLLECTION EVENTs
+    @property 
+    def collection_event_button(self):
+        return Static._data["BUTTON_CORDS"]["COLLECTION_EVENT"]["EVENT_BUTTON"]
+
+    # TODO: detect insta monkeys and click on their position instead of just clicking randomly
+    @property
+    def f_left_insta(self):
+        return Static._data["BUTTON_CORDS"]["COLLECTION_EVENT"]["F_LEFT_INSTA"]
+
+    @property
+    def f_right_insta(self):
+        return Static._data["BUTTON_CORDS"]["COLLECTION_EVENT"]["F_RIGHT_INSTA"]
+
+    @property
+    def left_insta(self):
+        return Static._data["BUTTON_CORDS"]["COLLECTION_EVENT"]["LEFT_INSTA"]
+
+    @property
+    def right_insta(self):
+        return Static._data["BUTTON_CORDS"]["COLLECTION_EVENT"]["RIGHT_INSTA"]
+
+    @property
+    def middle_insta(self):
+        return Static._data["BUTTON_CORDS"]["COLLECTION_EVENT"]["MID_INSTA"]
+
+    @property
+    def collection_continue(self):
+        return Static._data["BUTTON_CORDS"]["COLLECTION_EVENT"]["CONTINUE"]
+
+    # Hero menu
+    @property
+    def hero_menu_button(self):
+        return Static._data["BUTTON_CORDS"]["HERO"]["HERO_SELECT"]
+
+    @property
+    def hero_confirm(self):
+        return Static._data["BUTTON_CORDS"]["HERO"]["CONFIRM_HERO"]
+
+
+    
+    
+
