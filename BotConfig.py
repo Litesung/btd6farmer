@@ -17,8 +17,7 @@ class BotConfig:
         Also holds generic information souch as screen resolution
     """
     def __init__(self, user_args):
-        self.gameplan_path = user_args["gameplan"]
-        self.setup_path = user_args["setup"]
+        self.path = user_args["path"]
 
         self.bot_start_time = time.time()
         self.game_start_time = time.time()
@@ -28,12 +27,13 @@ class BotConfig:
         self.restart_mode = user_args["restart"]
         self.sandbox_mode = user_args["sandbox"]
 
-        self.gameplan = self._load_json(self.gameplan_path/ "instructions.json")
-        self._game_plan_copy = copy.deepcopy(self.game_plan) # Unmodified version of gameplan
-        self.gameplan_settings = self._load_json(self.setup_path/ "setup.json")
+        self.gameplan = self._load_json(self.path/ "instructions.json")
+        self.gameplan_settings = self._load_json(self.path / "setup.json")
+        
+        self._game_plan_copy = copy.deepcopy(self.gameplan) # Unmodified version of gameplan
 
         # Gets all neccecary information from the static classes
-        self.map = Map(self.map_name)
+        self.map = Map(self.map_name, self.gamemode, self.difficulty)
         self.hero = Hero(self.hero_name, self._game_plan_copy, self.map)
 
         try:
@@ -53,9 +53,9 @@ class BotConfig:
         except Exception as e:
             raise Exception("Could not retrieve monitor resolution")
 
-    @property
-    def gameplan(self):
-        return self.gameplan
+    # @property
+    # def gameplan(self):
+    #     return self.gameplan
 
     @property
     def version(self):
