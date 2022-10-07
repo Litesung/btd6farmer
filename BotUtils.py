@@ -18,7 +18,7 @@ from BotConfig import BotConfig
 
 class BotUtils(BotConfig):
     def __init__(self, user_args):
-        BotConfig.__init__(user_args)
+        BotConfig.__init__(self, user_args)
         # Resolutions for for padding
         self.reso_16 = [
             { "width": 1280, "height": 720  },
@@ -83,6 +83,7 @@ class BotUtils(BotConfig):
 
         # If location is a string then assume that its a static button
         if isinstance(location, str):
+            raise Exception("using string values ({}) as location is deprecated please use Generic Properties".format(location))
             location = self.buttons[location]
         
         # Move mouse to location
@@ -151,7 +152,7 @@ class BotUtils(BotConfig):
         y = pos_list[1] * self.height
         x = x + self._padding() # Add's the pad to to the curent x position variable
 
-        if self.DEBUG:
+        if self.debug_mode:
             self.log("Scaling: {} -> {}".format(pos_list, (int(x), int(y))))
 
         return (int(x), int(y))
@@ -211,7 +212,7 @@ class BotUtils(BotConfig):
         
         return img_cv
 
-    def _locate_all(self, template_path, width, height, confidence=0.9, limit=100, region=None):
+    def _locate_all(self, template_path, confidence=0.9, limit=100, region=None):
         """
             Template matching a method to match a template to a screenshot taken with mss.
             
@@ -222,7 +223,7 @@ class BotUtils(BotConfig):
 
             Returns a list of cordinates to where openCV found matches of the template on the screenshot taken
         """
-        monitor = {'top': 0, 'left': 0, 'width': width, 'height': height} if region is None else region
+        monitor = {'top': 0, 'left': 0, 'width': self.width, 'height': self.height} if region is None else region
 
         if  0.0 > confidence <= 1.0:
             raise ValueError("Confidence must be a value between 0.0 and 1.0")
@@ -232,7 +233,7 @@ class BotUtils(BotConfig):
             # Load the taken screenshot into a opencv img object
             img = np.array(sct.grab(monitor))
             screenshot = self._load_img(img)
-            if self.DEBUG:
+            if self.debug_mode:
                 cv2.imwrite("test.png", screenshot) 
 
             if region:
@@ -295,7 +296,7 @@ class BotUtils(BotConfig):
             
             # If it cant find anything
             if area == None:
-                if self.DEBUG:
+                if self.debug_mode:
                     self.log("Could not find round area, setting default values")
                 scaled_values = self._scaling([0.72265625, 0.0243055555555556]) # Use default values
 
@@ -336,7 +337,7 @@ class BotUtils(BotConfig):
                 return int(found_text.group(0))
 
             else:
-                if self.DEBUG:
+                if self.debug_mode:
                     self.log("Found text '{}' does not match regex requirements".format(found_text))
                     self.save_file(data=mss.tools.to_png(sct_image.rgb, sct_image.size), _file_name="get_current_round_failed.png")
                     self.log("Saved screenshot of what was found")
