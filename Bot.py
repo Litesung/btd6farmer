@@ -528,14 +528,12 @@ class Bot(BotCore):
     def ingame_loop(self):
 
         current_round = -1
-        ability_one_timer = time.time()
-        ability_two_timer = time.time()
-        ability_three_timer = time.time()
+        ability_timers = [time.time(), time.time(), time.time()]
         
         finished = False
         middle_of_screen = (0.5, 0.5)
 
-        abillty_one_round, abillty_two_round, abillty_three_round = self.abilityRounds
+        ab_rounds = self.abilityRounds
         
         # main ingame loop
         while not finished:
@@ -580,22 +578,11 @@ class Bot(BotCore):
                 # TODO: Calculate round dynamically, base on which round hero has been placed.
                 cooldowns = static.hero_cooldowns[self.settings["HERO"]]
 
-                if len(cooldowns) >= 1:
-                    if current_round >= abillty_one_round and self.abilityAvaliabe(ability_one_timer, cooldowns[0]):
-                        self.press_key("1")
-                        ability_one_timer = time.time()
-                
-                if len(cooldowns) >= 2:
-                    # skip if ezili or adora, their lvl 7 ability is useless
-                    if current_round >= abillty_two_round and self.abilityAvaliabe(ability_two_timer, cooldowns[1]) and (self.settings["HERO"] != "EZILI" and "ADORA"):
-                        self.press_key("2")
-                        ability_two_timer = time.time()
-                
-                if len(cooldowns) >= 3:
-                    if current_round >= abillty_three_round and self.abilityAvaliabe(ability_three_timer, cooldowns[2]):
-                        self.press_key("3")
-                        ability_three_timer = time.time()
-
+                for idx, ability in enumerate(ab_rounds):
+                    if current_round >= ability and self.abilityAvaliabe(ability_timers[idx], cooldowns[0]):
+                        self.press_key(str(idx+1))
+                        ability_timers[idx] = time.time()
+            
                 # Check for round in game plan
                 if str(current_round) in self.game_plan:
                     
