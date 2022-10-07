@@ -32,8 +32,17 @@ class BotUtils:
         try:
             if sys.platform == "win32":
                 ctypes.windll.shcore.SetProcessDpiAwareness(2) # DPI indipendent
+            
             tk = tkinter.Tk()
             self.width, self.height = tk.winfo_screenwidth(), tk.winfo_screenheight()
+
+            # if sys.platform == "linux":
+            #     import subprocess
+            #     output = subprocess.Popen('xrandr | grep "primary" | grep -Eo "[0-9][0-9][0-9][0-9]x[0-9][0-9][0-9][0-9]" | cut -d" " -f4',shell=True, stdout=subprocess.PIPE).communicate()[0]
+            #     if len(output) > 0:
+            #         output = output.decode("utf-8").replace("\n", "")
+            #         self.width, self.height = map(int, output.split("x"))
+
         except Exception as e:
             raise Exception("Could not retrieve monitor resolution")
 
@@ -326,7 +335,6 @@ class BotUtils:
 
             Returns a list of cordinates to where openCV found matches of the template on the screenshot taken
         """
-
         monitor = {'top': 0, 'left': 0, 'width': self.width, 'height': self.height} if region is None else region
 
         if  0.0 > confidence <= 1.0:
@@ -336,7 +344,9 @@ class BotUtils:
 
             # Load the taken screenshot into a opencv img object
             img = np.array(sct.grab(monitor))
-            screenshot = self._load_img(img) 
+            screenshot = self._load_img(img)
+            if self.DEBUG:
+                cv2.imwrite("test.png", screenshot) 
 
             if region:
                 screenshot = screenshot[region[1]:region[1]+region[3],
@@ -457,8 +467,8 @@ class BotLog:
         
         return data
 
-    def log(self, *kargs):
-        print(*kargs)
+    def log(self, *args):
+        print(*args)
 
 class BotCore(BotLog, BotUtils):
     def __init__(self, instruction_path=Path.cwd()/"Instructions"/"Dark_Castle_Hard_Standard", game_plan_filename="instructions.json", game_settings_filename="setup.json"):
@@ -472,6 +482,13 @@ class BotCore(BotLog, BotUtils):
 
         BotLog.__init__(self)
         BotUtils.__init__(self)
+
+    @property
+    def hero(self) -> str:
+        """
+            Returns the hero name
+        """
+        return self.settings["HERO"]
 
     def _load_json(self, path):
         """
@@ -499,6 +516,8 @@ class Bot(BotCore):
         self.game_start_time = time.time()
         self.fast_forward = True
 
+        self.abilityRounds
+
     def initilize(self):
         if self.DEBUG:
             self.log("RUNNING IN DEBUG MODE, DEBUG FILES WILL BE GENERATED")
@@ -515,6 +534,8 @@ class Bot(BotCore):
         
         finished = False
         middle_of_screen = (0.5, 0.5)
+
+        abillty_one_round, abillty_two_round, abillty_three_round = self.abilityRounds
         
         # main ingame loop
         while not finished:
@@ -557,22 +578,23 @@ class Bot(BotCore):
             if current_round != None:
                 # Saftey net; use abilites
                 # TODO: Calculate round dynamically, base on which round hero has been placed.
-                if self.settings["HERO"] != "GERALDO": # geraldo doesn't any ability
-                    cooldowns = static.hero_cooldowns[self.settings["HERO"]]
+                cooldowns = static.hero_cooldowns[self.settings["HERO"]]
 
-                    if current_round >= 7 and self.abilityAvaliabe(ability_one_timer, cooldowns[0]):
+                if len(cooldowns) >= 1:
+                    if current_round >= abillty_one_round and self.abilityAvaliabe(ability_one_timer, cooldowns[0]):
                         self.press_key("1")
                         ability_one_timer = time.time()
-                    
+                
+                if len(cooldowns) >= 2:
                     # skip if ezili or adora, their lvl 7 ability is useless
-                    if current_round >= 31 and self.abilityAvaliabe(ability_two_timer, cooldowns[1]) and (self.settings["HERO"] != "EZILI" and "ADORA"):
+                    if current_round >= abillty_two_round and self.abilityAvaliabe(ability_two_timer, cooldowns[1]) and (self.settings["HERO"] != "EZILI" and "ADORA"):
                         self.press_key("2")
                         ability_two_timer = time.time()
-                    
-                    if len(cooldowns) == 3:
-                        if current_round >= 53 and self.abilityAvaliabe(ability_three_timer, cooldowns[2]):
-                            self.press_key("3")
-                            ability_three_timer = time.time()
+                
+                if len(cooldowns) >= 3:
+                    if current_round >= abillty_three_round and self.abilityAvaliabe(ability_three_timer, cooldowns[2]):
+                        self.press_key("3")
+                        ability_three_timer = time.time()
 
                 # Check for round in game plan
                 if str(current_round) in self.game_plan:
@@ -592,6 +614,147 @@ class Bot(BotCore):
 
                             if self.DEBUG:
                                 self.log("Current round", current_round) # Only print current round once
+    
+    @property
+    def round_xp_gain(self):
+        """
+            Round 1 starts off with 40 XP, and up until round 20 this amount increases by 20 each round (40 XP, 60 XP, 80 XP, and so on). Then on rounds 21-50 the amount experience gained each round increases by 40 each round (460 XP, 500 XP, and so on). And last, from round 51 and further, this amount increases by 90 each round (1710 XP, 1800 XP, and so on). Adding this up, you get a total of 231,150 XP in a game from round 6 to round 100 on Impoppable or C.H.I.M.P.S.. Each map difficulty above beginner gives a 10% xp bonus, e.g. playing on expert gives you a 30% XP boost. 
+
+            TODO: Calculate base xp gain per level
+            https://github.com/hemisemidemipresent/cyberquincy/blob/dd41deb3fe44f0812331649c541344005b360a59/helpers/heroes.js#L54-L93
+        """
+
+        LEVELING_MAP_DIFFICULTY_MODIFIERS = {
+            "BEGINNER": 1,
+            "INTERMEDIATE": 1.1,
+            "ADVANCED": 1.2,
+            "EXPERT": 1.3,
+        }
+
+        acc_xp_gain = {
+
+        }
+        gain = 0
+        for r in range(1, 101):
+            if r == 0:
+                gain = 0
+            elif r == 1: # starts off with 40 XP
+                gain += 40
+            elif r < 21: # r2-r20
+                gain += 20
+            elif r < 51: # r21-r50
+                gain += 40
+            else:        # 90 gain
+                gain += 90
+
+            acc_xp_gain[r] = gain * LEVELING_MAP_DIFFICULTY_MODIFIERS[static.map_difficulties[self.settings["MAP"]]]
+
+        
+        print(sum([xp for xp in acc_xp_gain.values()]))
+        # from pprint import pprint
+        # pprint(acc_xp_gain)
+        # assert sum([xp for xp in acc_xp_gain.values()]) == 231150
+        return acc_xp_gain
+            
+
+    @property
+    def abilityRounds(self) -> tuple[int]:
+        """
+            Will return a list rounds that all hero abilities should be unlocked
+
+            NOTES: 
+                - All heroes have a specific XP ratio. Heroes with a higher XP ratio require more XP to level up and therefore level up slower.
+                - Heroes gain XP at the end of the round by the same formula as towers
+                - Each hero has multiple abilities (all have two with the exception of Ezili, Adora, and Admiral Brickell, who have three and Geraldo who has one) 
+                  that can be used to the player's advantage. The first ability is unlocked at level 3, and the second ability is unlocked at level 10; 
+                  for Ezili, Adora and Brickell, they gain their second ability at level 7 and third at level 10. 
+                  The highest level a hero can reach is 20. 
+                - Hero XP amount is calculate the same way as tower xp https://bloons.fandom.com/wiki/Experience_Points#BTD6
+
+            For example:
+                - Obyn has a xp ratio of 1.0. He gets his abillity at round 3 and 10.
+                    If he is placed at round lvl 12 he will get his abilities at round 14 and 51
+
+            TODO: 
+                - Add support for energizer (Energizer is the only tower that increases levelling speed.)
+                - MK or support for everyone w/o MK? 
+                    - There are several Monkey Knowledge points that can affect hero levelling:
+                        - Self Taught Heroes: +10% XP
+                        - Monkey Education: +8% XP
+                        - Monkeys Together Strong: +5% XP
+                        - Scholarships: -10% cost
+                - Each map difficulty above beginner gives a 10% xp bonus, e.g. playing on expert gives you a 30% XP boost. 
+        """
+        def xp_forumla(ability_levels_list, round_hero_placed, xp_ratio=static.hero_xp_ratio[self.settings["HERO"]], ):
+            if self.DEBUG:
+                self.log("Ability aqquired at levels: {}, Hero placed round: {}".format(ability_levels_list, round_hero_placed))
+
+            
+            xp_map = self.round_xp_gain
+            # for for every ability
+            for level_ability_unlocked in ability_levels_list:
+                if self.DEBUG:
+                    self.log("==Level that ability will be unlocked: {}".format(level_ability_unlocked))
+
+                # reset hero abillity counter to the round the hero was placed
+                round_since_hero_placed = round_hero_placed
+
+                # Defined xp_sum to the amount of xp earned at the end of the round
+                accumilated_xp_sum = xp_map[round_since_hero_placed]
+
+                # Calculate the total xp needed to reach ability level    
+                total_hero_xp_needed = 0
+                for hero_level, xp_gained_amount in static.hero_xp.items():
+                    if hero_level < level_ability_unlocked:
+                        total_hero_xp_needed += xp_gained_amount 
+
+                total_hero_xp_needed *= xp_ratio
+
+                        
+                print("total hero xp needed {} for ability gained from level {}".format(total_hero_xp_needed, level_ability_unlocked))
+                
+                while accumilated_xp_sum < np.round(total_hero_xp_needed):
+                    
+                    # XP gain undefined after round 100
+                    if round_since_hero_placed > 100:
+                        xp_gain += xp_map[100]
+                    
+                    round_since_hero_placed += 1
+                    xp_gain = np.round(xp_map[round_since_hero_placed])
+                    accumilated_xp_sum += xp_gain
+
+                    if self.DEBUG:
+                        self.log("added {} to xp_sum".format(xp_map[round_since_hero_placed]))
+                        self.log("  Round since hero placed: {}; xp_sum: {}; required xp {}".format(round_since_hero_placed, accumilated_xp_sum, total_hero_xp_needed))
+
+                # When xp_sum is greater than to the xp needed for the next level, we have found the round
+                yield round_since_hero_placed + 1
+
+
+        # Move this to somewhere else
+        round_hero_placed = -1
+        for round in self.game_plan.keys():
+            for instruction in self.game_plan[round]:
+                if instruction["INSTRUCTION_TYPE"] == "PLACE_TOWER":
+                    if instruction["ARGUMENTS"]["MONKEY"] == "HERO":
+                        round_hero_placed = int(round)
+                        break
+
+        abilities_round = [ r for r in xp_forumla(static.hero_ability_unlock[self.settings["HERO"]], round_hero_placed) ]
+        print(abilities_round)
+
+        if self.DEBUG:
+            print("Ability rounds set to: {}".format(abilities_round))
+            test1 = [r for r in xp_forumla([x for x in range(1, 21)], 12)]
+            test2 = [r for r in xp_forumla([x for x in range(1, 21)], 1 )]
+
+            print("Test1 levels 1-20 placement on round 12 {}".format(test1))
+            print("Test2 levels 1-20 placement on round 6  {}".format(test2))
+
+            # assert [14, 51] == [r for r in xp_forumla([3, 10], 12)], "Example input not equal expected output"
+            self.log("Hero abilities will be unlocked on rounds rounds: {}".format(abilities_round))
+
+        return abilities_round
 
     def exit_bot(self): 
         self.running = False
@@ -610,14 +773,11 @@ class Bot(BotCore):
         # Convert upgrade_path to something usable
         top, middle, bottom = upgrade_path
         
-        for _ in range(top):
-            self.press_key(static.upgrade_keybinds["top"])
+        self.press_key(static.upgrade_keybinds["top"], amount=top)
 
-        for _ in range(middle):
-            self.press_key(static.upgrade_keybinds["middle"])
+        self.press_key(static.upgrade_keybinds["middle"], amount=middle)
 
-        for _ in range(bottom):
-            self.press_key(static.upgrade_keybinds["bottom"])
+        self.press_key(static.upgrade_keybinds["bottom"], amount=bottom)
         
         self.press_key("esc")
 

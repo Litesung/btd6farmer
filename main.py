@@ -44,7 +44,7 @@ def main(arg_parser):
 
     while waiting_for_home is False:
         if bot.DEBUG:
-            print("Waiting for loading screen..")
+            print("Waiting for Home screen..")
         time.sleep(0.2) # add a short timeout to avoid spamming the cpu
         waiting_for_home = bot.home_menu_check()
 

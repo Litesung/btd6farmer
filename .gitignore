@@ -136,3 +136,11 @@ dmypy.json
 # Pyre type checker
 .pyre/
 run-debug.bat
+
+
+# pyenv
+bin/
+lib64/
+lib64
+lib/
+pyvenv.cfg
