@@ -234,7 +234,7 @@ class Static:
                 "SCRAPYARD" : {
                     "LOCATION":[1, 4], 
                     "DIFFICULTY" : 1
-                    },
+                },
                 "THE_CABIN" : {
                     "LOCATION":[1, 5], 
                     "DIFFICULTY" : 1
@@ -300,166 +300,178 @@ class Static:
                     "DIFFICULTY" : 1
                 },
                 # INTERMEDIATE
-                "QUIET_STREET" : {
+                "COVERED_GARDEN" : {
                     "LOCATION":[5, 1],
                     "DIFFICULTY" : 2
                 },
-                "BLOONARIUS_PRIME" : {
+                "QUARRY" : {
                     "LOCATION":[5, 2],
                     "DIFFICULTY" : 2
                 },
-                "BALANCE" : {
+                "QUIET_STREET" : {
                     "LOCATION":[5, 3],
                     "DIFFICULTY" : 2
                 },
-                "ENCRYPTED" : {
+                "BLOONARIUS_PRIME" : {
                     "LOCATION":[5, 4],
                     "DIFFICULTY" : 2
                 },
-                "BAZAAR" : {
+                "BALANCE" : {
                     "LOCATION":[5, 5],
                     "DIFFICULTY" : 2
                 },
-                "ADORAS_TEMPLE" : {
+                "ENCRYPTED" : {
                     "LOCATION":[5, 6],
                     "DIFFICULTY" : 2
                 },
-                "SPRING_SPRING" : {
+                "BAZAAR" : {
                     "LOCATION":[6, 1],
                     "DIFFICULTY" : 2
                 },
-                "KARTSNDARTS" : {
+                "ADORAS_TEMPLE" : {
                     "LOCATION":[6, 2],
                     "DIFFICULTY" : 2
                 },
-                "MOON_LANDING" : {
+                "SPRING_SPRING" : {
                     "LOCATION":[6, 3],
                     "DIFFICULTY" : 2
                 },
-                "HAUNTED" : {
+                "KARTSNDARTS" : {
                     "LOCATION":[6, 4],
                     "DIFFICULTY" : 2
                 },
-                "DOWNSTREAM" : {
+                "MOON_LANDING" : {
                     "LOCATION":[6, 5],
                     "DIFFICULTY" : 2
                 },
-                "FIRING_RANGE" : {
+                "HAUNTED" : {
                     "LOCATION":[6, 6],
                     "DIFFICULTY" : 2
-                }, 
-                "CRACKED" : {
+                },
+                "DOWNSTREAM" : {
                     "LOCATION":[7, 1],
                     "DIFFICULTY" : 2
                 },
-                "STREAMBED" : {
+                "FIRING_RANGE" : {
                     "LOCATION":[7, 2],
                     "DIFFICULTY" : 2
-                },
-                "CHUTES" : {
+                }, 
+                "CRACKED" : {
                     "LOCATION":[7, 3],
                     "DIFFICULTY" : 2
                 },
-                "RAKE" : {
+                "STREAMBED" : {
                     "LOCATION":[7, 4],
                     "DIFFICULTY" : 2
                 },
-                "SPICE_ISLANDS" : {
+                "CHUTES" : {
                     "LOCATION":[7, 5],
                     "DIFFICULTY" : 2
                 },
+                "RAKE" : {
+                    "LOCATION":[7, 6],
+                    "DIFFICULTY" : 2
+                },
+                "SPICE_ISLANDS" : {
+                    "LOCATION":[8, 1],
+                    "DIFFICULTY" : 2
+                },
                 # ADVANCED
+                "MIDNIGHT_MANSION" : {
+                    "LOCATION":[9, 1],
+                    "DIFFICULTY" : 2
+                },
                 "SUNKEN_COLUMNS" : {
-                    "LOCATION":[8, 1], 
-                    "DIFFICULTY" : 3
-                },
-                "XFACTOR" : {
-                    "LOCATION":[8, 2], 
-                    "DIFFICULTY" : 3
-                },
-                "MESA" : {
-                    "LOCATION":[8, 3], 
-                    "DIFFICULTY" : 3
-                },
-                "GEARED" : {
-                    "LOCATION":[8, 4], 
-                    "DIFFICULTY" : 3
-                },
-                "SPILLWAY" : {
-                    "LOCATION":[8, 5], 
-                    "DIFFICULTY" : 3
-                },
-                "CARGO" : {
-                    "LOCATION":[8, 6], 
-                    "DIFFICULTY" : 3
-                },
-                "PATS_POND" : {
-                    "LOCATION":[9, 1], 
-                    "DIFFICULTY" : 3
-                },
-                "PENINSULA" : {
                     "LOCATION":[9, 2], 
                     "DIFFICULTY" : 3
                 },
-                "HIGH_FINANCE" : {
+                "XFACTOR" : {
                     "LOCATION":[9, 3], 
-                    "DIFFICULTY" : 3}
-                , 
-                "ANOTHER_BRICK" : {
+                    "DIFFICULTY" : 3
+                },
+                "MESA" : {
                     "LOCATION":[9, 4], 
                     "DIFFICULTY" : 3
                 },
-                "OFF_THE_COAST" : {
+                "GEARED" : {
                     "LOCATION":[9, 5], 
                     "DIFFICULTY" : 3
                 },
-                "CORNFIELD" : {
+                "SPILLWAY" : {
                     "LOCATION":[9, 6], 
                     "DIFFICULTY" : 3
                 },
-                "UNDERGROUND" : {
+                "CARGO" : {
                     "LOCATION":[10, 1], 
+                    "DIFFICULTY" : 3
+                },
+                "PATS_POND" : {
+                    "LOCATION":[10, 2], 
+                    "DIFFICULTY" : 3
+                },
+                "PENINSULA" : {
+                    "LOCATION":[10, 3], 
+                    "DIFFICULTY" : 3
+                },
+                "HIGH_FINANCE" : {
+                    "LOCATION":[10, 4], 
+                    "DIFFICULTY" : 3}
+                , 
+                "ANOTHER_BRICK" : {
+                    "LOCATION":[10, 5], 
+                    "DIFFICULTY" : 3
+                },
+                "OFF_THE_COAST" : {
+                    "LOCATION":[10, 6], 
+                    "DIFFICULTY" : 3
+                },
+                "CORNFIELD" : {
+                    "LOCATION":[11, 1], 
+                    "DIFFICULTY" : 3
+                },
+                "UNDERGROUND" : {
+                    "LOCATION":[11, 2], 
                     "DIFFICULTY" : 3
                 },
                 # EXPERT
                 "SANCTUARY" : {
-                    "LOCATION":[11, 1], 
-                    "DIFFICULTY" : 4
-                },
-                "RAVINE" : {
-                    "LOCATION":[11, 2], 
-                    "DIFFICULTY" : 4
-                },
-                "FLOODED_VALLEY" : {
-                    "LOCATION":[11, 3], 
-                    "DIFFICULTY" : 4
-                },
-                "INFERNAL" : {
-                    "LOCATION":[11, 4], 
-                    "DIFFICULTY" : 4
-                },
-                "BLOODY_PUDDLES" : {
-                    "LOCATION":[11, 5], 
-                    "DIFFICULTY" : 4
-                },
-                "WORKSHOP" : {
-                    "LOCATION":[11, 6], 
-                    "DIFFICULTY" : 4
-                },
-                "QUAD" : {
                     "LOCATION":[12, 1], 
                     "DIFFICULTY" : 4
                 },
-                "DARK_CASTLE" : {
+                "RAVINE" : {
                     "LOCATION":[12, 2], 
                     "DIFFICULTY" : 4
                 },
-                "MUDDY_PUDDLES" : {
+                "FLOODED_VALLEY" : {
                     "LOCATION":[12, 3], 
                     "DIFFICULTY" : 4
                 },
-                "OUCH" : {
+                "INFERNAL" : {
                     "LOCATION":[12, 4], 
+                    "DIFFICULTY" : 4
+                },
+                "BLOODY_PUDDLES" : {
+                    "LOCATION":[12, 5], 
+                    "DIFFICULTY" : 4
+                },
+                "WORKSHOP" : {
+                    "LOCATION":[12, 6], 
+                    "DIFFICULTY" : 4
+                },
+                "QUAD" : {
+                    "LOCATION":[13, 1], 
+                    "DIFFICULTY" : 4
+                },
+                "DARK_CASTLE" : {
+                    "LOCATION":[13, 2], 
+                    "DIFFICULTY" : 4
+                },
+                "MUDDY_PUDDLES" : {
+                    "LOCATION":[13, 3], 
+                    "DIFFICULTY" : 4
+                },
+                "OUCH" : {
+                    "LOCATION":[13, 4], 
                     "DIFFICULTY" : 4
                 }
          
